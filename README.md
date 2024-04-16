@@ -1,4 +1,4 @@
-# Ultrahand Overlay (HOS 16.0.0+)
+# Ultrahand Overlay (HOS 16.0.0 und höher)
 
 Das Ultrahand Overlay ist ein Ersatz für das [Tesla Menu](https://github.com/WerWolv/Tesla-Menu), das von Grund auf auf [libtesla](https://github.com/WerWolv/libtesla) aufgebaut ist und leistungsstarke C/C++-Befehle über die Verwendung einer eigenen interpretativen Programmiersprache (ähnlich wie Shell/BASH) bietet. Es ist ein vielseitiges Tool, das es dir ermöglicht, benutzerdefinierte Befehls basierte Pakete zu erstellen und zu teilen, um die Verwaltung von Einstellungen, Dateien und Verzeichnissen auf deiner Nintendo Switch zu verbessern.
 
@@ -39,9 +39,9 @@ Das Ultrahand Overlay bietet derzeit folgende Funktionen:
 Um Ultrahand zu verwenden, befolge diese Schritte:
 
 1. Lade die neueste [nxovloader](https://github.com/WerWolv/nx-ovlloader) herunter und installiere sie.
-2. Lade das neueste Ultrahand [ovlmenu.ovl](https://github.com/ppkantorski/Ultrahand-Overlay/releases/latest/download/ovlmenu.ovl) herunter und platziere es unter `/switch/.overlays/`.
+2. Lade das neueste Ultrahand (Fork) [ovlmenu.ovl](https://github.com/glitched-nx/Ultrahand-Overlay/releases/latest/download/ovlmenu.ovl) herunter und platziere es unter `/switch/.overlays/`.
     - WARNUNG: Dies überschreibt `Tesla Menu`, wenn es bereits installiert ist.
-3. Nach der Installation des Ultrahand Overlays wird ein neuer Ordner namens `ultrahand` innerhalb des Root-Konfigurationsordners auf deiner SD-Karte (`/config/ultrahand/`) zusammen mit einer `config.ini`-Datei erstellt, die verschiedene Ultrahand-Einstellungen enthält.
+3. Nach der Installation des Ultrahand Overlays wird ein neuer Ordner namens `ultrahand` im config Verzeichnis auf deiner SD-Karte (`/config/ultrahand/`) zusammen mit einer `config.ini`-Datei erstellt, die verschiedene Ultrahand-Einstellungen enthält.
 4. Starte Ultrahand ähnlich wie `Tesla Menu` mit deinem festgelegten Hotkey. Es wird ein neuer Ordner (`/switch/.packages/`) mit einer vordefinierten `package.ini`-Datei für deine Grundmenübefehle erstellt.
 
 5. Platziere deine benutzerdefinierte `package.ini`-Paketdatei in deinem Ultrahand-Paketverzeichnis (`/switch/.packages/<PACKAGE_NAME>/`). Diese Datei enthält die Befehle für dein benutzerdefiniertes Ultrahand-Paket.
@@ -53,7 +53,7 @@ Um Ultrahand zu verwenden, befolge diese Schritte:
 - Du kannst auf einer Überlagerung/einem Paket oben auf `X` klicken, um sie zu favorisieren.
 - Du kannst auf einer Überlagerung/einem Paket oben auf `Y` klicken, um zusätzliche Einstellungen zu konfigurieren.
 
-Für zusätzliche Unterstützung bei benutzerdefinierten Paketen kannst du das [Ultrahand Overlay Wiki](https://github.com/ppkantorski/Ultrahand-Overlay/wiki) besuchen.
+Für zusätzliche Unterstützung bei benutzerdefinierten Paketen kannst du das [Ultrahand Overlay Wiki](https://github.com/glitched-nx/Ultrahand-Overlay/wiki) besuchen.
 
 ### Nintendo Switch Kompatibilität
 Um das Ultrahand Overlay auf der Nintendo Switch auszuführen, musst du die erforderliche [Homebrew-Umgebung](https://github.com/Atmosphere-NX/Atmosphere) auf deiner Konsole mit HOS 16.0
@@ -62,17 +62,24 @@ Um das Ultrahand Overlay auf der Nintendo Switch auszuführen, musst du die erfo
 
 Bitte beachte, dass das Ausführen von Homebrew-Software auf deiner Nintendo Switch deine Garantie ungültig machen und bestimmte Risiken mit sich bringen kann. Stelle sicher, dass du die Auswirkungen verstehst und die entsprechenden Richtlinien und Vorsichtsmaßnahmen befolgst, wenn du Homebrew-Software verwendest.
 
-### Kompilationsvoraussetzungen
+### Kompilierung & Abhängigkeiten
 
 Um die Software zu kompilieren und auszuführen, müssen die folgenden C/C++-Abhängigkeiten installiert sein:
 
-- [benutzerdefinierter libtesla Fork](https://github.com/ppkantorski/Ultrahand-Overlay/tree/main/lib/libtesla)
+- [benutzerdefinierter libtesla Fork](https://github.com/glitched-nx/Ultrahand-Overlay/tree/main/lib/libtesla)
 - switch-curl
 - switch-zziplib
 - switch-mbedtls
 - switch-jansson
 
-## Beitrag
+
+
+## Hinweise zum Fork
+
+Hierbei handelt es sich um einen Fork des Original-Projekts [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay) von [**ppkantorski**](https://github.com/ppkantorski), dem Schöpfer des Projekts. Die Repository ist vollständig ins Deutsche übersetzt worden. Dazu zählen Ultrahand selbst, die readme.md-Doku, alle Paket-Beispiele und Beispiel-Befehle, sowie deren readme.md-Doku und die Wiki-Doku.
+
+
+## Beiträge bitte direkt an [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay) richten. 
 
 Beiträge sind willkommen! Wenn du Ideen, Vorschläge oder Fehlermeldungen hast, bitte erstelle ein [Issue](https://github.com/ppkantorski/Ultrahand-Overlay/issues/new/choose), reiche einen [Pull-Request](https://github.com/ppkantorski/Ultrahand-Overlay/compare) ein oder kontaktiere mich direkt auf [GBATemp](https://gbatemp.net/threads/ultrahand-overlay-the-fully-craft-able-overlay-executor.633560/).
 
