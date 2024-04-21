@@ -79,7 +79,7 @@ Um die Software zu kompilieren und auszuführen, müssen die folgenden C/C++-Abh
 Hierbei handelt es sich um einen Fork des Original-Projekts [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay) von [**ppkantorski**](https://github.com/ppkantorski), dem Schöpfer des Projekts. Die Repository ist vollständig ins Deutsche übersetzt worden. Dazu zählen Ultrahand selbst, die readme.md-Doku, alle Paket-Beispiele und Beispiel-Befehle, sowie deren readme.md-Doku und die Wiki-Doku.
 
 
-## Beiträge bitte direkt an [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay) richten. 
+## Für Beiträge bitte über das original Repository des Schöpfers: [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay) 
 
 Beiträge sind willkommen! Wenn du Ideen, Vorschläge oder Fehlermeldungen hast, bitte erstelle ein [Issue](https://github.com/ppkantorski/Ultrahand-Overlay/issues/new/choose), reiche einen [Pull-Request](https://github.com/ppkantorski/Ultrahand-Overlay/compare) ein oder kontaktiere mich direkt auf [GBATemp](https://gbatemp.net/threads/ultrahand-overlay-the-fully-craft-able-overlay-executor.633560/).
 
