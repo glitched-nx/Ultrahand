@@ -13,7 +13,7 @@
  *   of the project's documentation and must remain intact.
  *
  *  Licensed under GPLv2
- *  Copyright (c) 2023 ppkantorski
+ *  Copyright (c) 2024 ppkantorski
  ********************************************************************************/
 
 #pragma once
@@ -134,6 +134,9 @@ void initializeTheme(std::string themeIniPath = themeConfigIniPath) {
             if (themedSection.count("highlight_color_2") == 0)
                 setIniFileValue(themeIniPath, "theme", "highlight_color_2", "#88FFFF");
             
+            if (themedSection.count("click_text_color") == 0)
+                setIniFileValue(themeIniPath, "theme", "click_text_color", "#000000");
+
             if (themedSection.count("click_color") == 0)
                 setIniFileValue(themeIniPath, "theme", "click_color", "#F7253E");
             
@@ -790,11 +793,11 @@ std::vector<std::vector<std::string>> getSourceReplacement(const std::vector<std
         if (commandName == "download")
             isDownloadCommand = true;
 
-        if (commandName == "erista:" || commandName == "Erista:") {
+        if (stringToLowercase(commandName) == "erista:") {
             inEristaSection = true;
             inMarikoSection = false;
             continue;
-        } else if (commandName == "mariko:" || commandName == "Mariko:") {
+        } else if (stringToLowercase(commandName) == "mariko:") {
             inEristaSection = false;
             inMarikoSection = true;
             continue;
@@ -938,11 +941,11 @@ void interpretAndExecuteCommand(const std::vector<std::vector<std::string>>& com
             if (logging)
                 logMessage("Try #"+std::to_string(tryCounter));
             continue;
-        } else if (commandName == "erista:" || commandName == "Erista:") {
+        } else if (stringToLowercase(commandName) == "erista:") {
             inEristaSection = true;
             inMarikoSection = false;
             continue;
-        } else if (commandName == "mariko:" || commandName == "Mariko:") {
+        } else if (stringToLowercase(commandName) == "mariko:") {
             inEristaSection = false;
             inMarikoSection = true;
             continue;
