@@ -32,6 +32,13 @@
 #include <tesla.hpp>
 
 
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+
+
+static std::atomic<bool> abortCommand(false);
+
 /**
  * @brief Ultrahand-Overlay Configuration Paths
  *
@@ -118,6 +125,9 @@ void initializeTheme(std::string themeIniPath = themeConfigIniPath) {
             
             if (themedSection.count("invalid_text_color") == 0)
                 setIniFileValue(themeIniPath, "theme", "invalid_text_color", "#FF0000");
+
+            if (themedSection.count("inprogress_text_color") == 0)
+                setIniFileValue(themeIniPath, "theme", "inprogress_text_color", "#FFFF45");
             
             if (themedSection.count("selection_text_color") == 0)
                 setIniFileValue(themeIniPath, "theme", "selection_text_color", "#FFFFFF");
@@ -133,6 +143,12 @@ void initializeTheme(std::string themeIniPath = themeConfigIniPath) {
             
             if (themedSection.count("highlight_color_2") == 0)
                 setIniFileValue(themeIniPath, "theme", "highlight_color_2", "#88FFFF");
+
+            if (themedSection.count("highlight_color_3") == 0)
+                setIniFileValue(themeIniPath, "theme", "highlight_color_3", "#FFFF45");
+
+            if (themedSection.count("highlight_color_4") == 0)
+                setIniFileValue(themeIniPath, "theme", "highlight_color_4", "#F7253E");
             
             if (themedSection.count("click_text_color") == 0)
                 setIniFileValue(themeIniPath, "theme", "click_text_color", "#000000");
@@ -180,11 +196,14 @@ void initializeTheme(std::string themeIniPath = themeConfigIniPath) {
         setIniFileValue(themeIniPath, "theme", "on_text_color", "#00FFDD");
         setIniFileValue(themeIniPath, "theme", "off_text_color", "#AAAAAA");
         setIniFileValue(themeIniPath, "theme", "invalid_text_color", "#FF0000");
+        setIniFileValue(themeIniPath, "theme", "inprogress_text_color", "#FFFF45");
         setIniFileValue(themeIniPath, "theme", "selection_text_color", "#FFFFFF");
         setIniFileValue(themeIniPath, "theme", "selection_bg_color", "#000000");
         setIniFileValue(themeIniPath, "theme", "trackbar_color", "#555555");
         setIniFileValue(themeIniPath, "theme", "highlight_color_1", "#2288CC");
         setIniFileValue(themeIniPath, "theme", "highlight_color_2", "#88FFFF");
+        setIniFileValue(themeIniPath, "theme", "highlight_color_3", "#FFFF45");
+        setIniFileValue(themeIniPath, "theme", "highlight_color_4", "#F7253E");
         setIniFileValue(themeIniPath, "theme", "click_color", "#F7253E");
         setIniFileValue(themeIniPath, "theme", "invert_bg_click_color", "false");
         setIniFileValue(themeIniPath, "theme", "disable_selection_bg", "true");
@@ -893,7 +912,8 @@ std::vector<std::vector<std::string>> getSourceReplacement(const std::vector<std
  * @param commands A list of commands, where each command is represented as a vector of strings.
  */
 void interpretAndExecuteCommand(const std::vector<std::vector<std::string>>& commands, const std::string& packagePath="", const std::string& selectedCommand="") {
-    
+    //logMessage("INSIDE_INTERPRETER");
+
     bool logging = false;
     
     bool inEristaSection = false;
@@ -924,7 +944,12 @@ void interpretAndExecuteCommand(const std::vector<std::vector<std::string>>& com
     std::string message;
     
     for (const auto& cmd : commands) {
-        
+        if (abortCommand.load(std::memory_order_acquire)) {
+            abortCommand.store(false, std::memory_order_release);
+            commandSuccess = false;
+            return;
+        }
+
         // Check the command and perform the appropriate action
         if (cmd.empty())
             continue; // Empty command, do nothing
@@ -1239,9 +1264,13 @@ void interpretAndExecuteCommand(const std::vector<std::vector<std::string>>& com
                         //setIniFileValue((packagePath+configFileName).c_str(), selectedCommand.c_str(), "footer", "downloading");
                         for (size_t i = 0; i < 3; ++i) { // Try 3 times.
                             downloadSuccess = downloadFile(fileUrl, destinationPath);
+                            if (abortDownload.load(std::memory_order_acquire))
+                                break;
                             if (downloadSuccess)
                                 break;
                         }
+                        //downloadSuccess = enqueueDownloadFile(fileUrl, destinationPath);
+                        //downloadSuccess = downloadFile(fileUrl, destinationPath);
                         commandSuccess = (downloadSuccess && commandSuccess);
                     }
                 } else if (commandName == "unzip") {
@@ -1249,6 +1278,7 @@ void interpretAndExecuteCommand(const std::vector<std::vector<std::string>>& com
                         sourcePath = preprocessPath(modifiedCmd[1]);
                         destinationPath = preprocessPath(modifiedCmd[2]);
                         commandSuccess = unzipFile(sourcePath, destinationPath) && commandSuccess;
+                        //commandSuccess = enqueueUnzipFile(sourcePath, destinationPath) && commandSuccess;
                     }
                 } else if (commandName == "pchtxt2ips") {
                     if (cmdSize >= 3) {
@@ -1427,3 +1457,77 @@ void interpretAndExecuteCommand(const std::vector<std::vector<std::string>>& com
         }
     }
 }
+
+
+// Thread information structure
+Thread interpreterThread;
+std::queue<std::tuple<std::vector<std::vector<std::string>>, std::string, std::string>> interpreterQueue;
+std::mutex queueMutex;
+std::condition_variable queueCondition;
+static bool interpreterThreadExit = false;
+
+void clearInterpreterFlags() {
+    runningInterpreter.store(false, std::memory_order_release);
+    abortDownload.store(false, std::memory_order_release);
+    abortUnzip.store(false, std::memory_order_release);
+    abortFileOp.store(false, std::memory_order_release);
+    abortCommand.store(false, std::memory_order_release);
+}
+
+void backgroundInterpreter(void*) {
+    while (!interpreterThreadExit) {
+        std::tuple<std::vector<std::vector<std::string>>, std::string, std::string> args;
+
+        {
+            std::unique_lock<std::mutex> lock(queueMutex);
+            queueCondition.wait(lock, [] { return !interpreterQueue.empty() || interpreterThreadExit; });
+
+            if (!interpreterQueue.empty()) {
+                args = std::move(interpreterQueue.front());
+                interpreterQueue.pop();
+            }
+        } // Release the lock before processing the command
+
+        if (!std::get<0>(args).empty()) {
+            // Clear flags and perform any cleanup if necessary
+            clearInterpreterFlags();
+            runningInterpreter.store(true, std::memory_order_release);
+
+            interpretAndExecuteCommand(std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::move(std::get<2>(args)));
+
+            runningInterpreter.store(false, std::memory_order_release);
+            // Clear flags and perform any cleanup if necessary
+            clearInterpreterFlags();
+        }
+    }
+}
+
+void startInterpreterThread() {
+    interpreterThreadExit = false;
+    threadCreate(&interpreterThread, backgroundInterpreter, nullptr, nullptr, 0x8000, 0x10, -2);
+    threadStart(&interpreterThread);
+}
+
+void closeInterpreterThread() {
+    {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        interpreterThreadExit = true;
+        queueCondition.notify_one();
+    }
+    threadWaitForExit(&interpreterThread);
+    threadClose(&interpreterThread);
+    // Reset flags
+    clearInterpreterFlags();
+}
+
+void enqueueInterpreterCommand(std::vector<std::vector<std::string>>&& commands, const std::string& packagePath, const std::string& selectedCommand) {
+    startInterpreterThread();
+    {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        interpreterQueue.emplace(std::move(commands), packagePath, selectedCommand);
+    }
+    queueCondition.notify_one();
+}
+
+
+

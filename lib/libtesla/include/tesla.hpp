@@ -153,6 +153,7 @@ static const std::string DROPDOWN_SYMBOL = "\u25B6";
 static const std::string CHECKMARK_SYMBOL = "\uE14B";
 static const std::string CROSSMARK_SYMBOL = "\uE14C";
 static const std::string DOWNLOAD_SYMBOL = "\u2193";
+static const std::string INPROGRESS_SYMBOL = "\u25CF";
 static const std::string STAR_SYMBOL = "\u2605";
 
 
@@ -688,6 +689,8 @@ static bool stillTouching = false;
 static bool interruptedTouch = false;
 static bool touchInBounds = false;
 
+// Define an atomic bool for interpreter completion
+static std::atomic<bool> runningInterpreter(false);
 
 // Battery implementation
 static bool powerInitialized = false;
@@ -2205,6 +2208,8 @@ namespace tsl {
             
             Color highlightColor1 = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "highlight_color_1"), "#2288CC");
             Color highlightColor2 = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "highlight_color_2"), "#88FFFF");
+            Color highlightColor3 = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "highlight_color_3"), "#FFFF45");
+            Color highlightColor4 = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "highlight_color_4"), "#F7253E");
             Color highlightColor = {0xf,0xf,0xf,0xf};
             
             Color clickColor = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "click_color"), "#F7253E");
@@ -2477,13 +2482,21 @@ namespace tsl {
                 //double timeCounter = 
                 //half progress = half((std::sin(2.0 * M_PI * fmod(std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count(), 1.0)) + 1.0) / 2.0);
                 progress = ((std::sin(2.0 * M_PI * fmod(std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count(), 1.0)) + 1.0) / 2.0);
-                
-                highlightColor = {
-                    static_cast<u8>((highlightColor1.r - highlightColor2.r) * progress + highlightColor2.r),
-                    static_cast<u8>((highlightColor1.g - highlightColor2.g) * progress + highlightColor2.g),
-                    static_cast<u8>((highlightColor1.b - highlightColor2.b) * progress + highlightColor2.b),
-                    0xF
-                };
+                if (runningInterpreter.load(std::memory_order_acquire)) {
+                    highlightColor = {
+                        static_cast<u8>((highlightColor3.r - highlightColor4.r) * progress + highlightColor4.r),
+                        static_cast<u8>((highlightColor3.g - highlightColor4.g) * progress + highlightColor4.g),
+                        static_cast<u8>((highlightColor3.b - highlightColor4.b) * progress + highlightColor4.b),
+                        0xF
+                    };
+                } else {
+                    highlightColor = {
+                        static_cast<u8>((highlightColor1.r - highlightColor2.r) * progress + highlightColor2.r),
+                        static_cast<u8>((highlightColor1.g - highlightColor2.g) * progress + highlightColor2.g),
+                        static_cast<u8>((highlightColor1.b - highlightColor2.b) * progress + highlightColor2.b),
+                        0xF
+                    };
+                }
                 x = 0;
                 y = 0;
                 
@@ -3680,7 +3693,8 @@ namespace tsl {
             
             tsl::Color defaultTextColor = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "text_color")); ; // CUSTOM MODIFICATION
             tsl::Color selectedTextColor = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "selection_text_color"));
-            
+            tsl::Color inprogressTextColor = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "inprogress_text_color"));
+
             tsl::Color invalidTextColor = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "invalid_text_color"), "#FF0000");
             tsl::Color onTextColor = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "on_text_color"), "#00FFDD");
             tsl::Color offTextColor = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "off_text_color"), "#AAAAAA");
@@ -3782,6 +3796,8 @@ namespace tsl {
                         renderer->drawString(this->m_value.c_str(), false, this->getX() + this->m_maxWidth + 45 + 10 +4, this->getY() + 45, 20, !useClickTextColor ? (this->m_faint ? offTextColor : selectedTextColor) : clickTextColor);
                     else
                         renderer->drawString(this->m_value.c_str(), false, this->getX() + this->m_maxWidth + 45 + 10 +4, this->getY() + 45, 20, !useClickTextColor ? (this->m_faint ? offTextColor : defaultTextColor) : clickTextColor);
+                } else if (this->m_value == DOWNLOAD_SYMBOL || this->m_value == INPROGRESS_SYMBOL) {
+                    renderer->drawString(this->m_value.c_str(), false, this->getX() + this->m_maxWidth + 45 + 10 +4, this->getY() + 45, 20, !useClickTextColor ? (this->m_faint ? offTextColor : inprogressTextColor) : clickTextColor);
                 } else if (this->m_value == CROSSMARK_SYMBOL) {
                     renderer->drawString(this->m_value.c_str(), false, this->getX() + this->m_maxWidth + 45 + 10 +4, this->getY() + 45, 20, !useClickTextColor ? (this->m_faint ? offTextColor : invalidTextColor) : clickTextColor);
                 } else {
@@ -4481,7 +4497,7 @@ namespace tsl {
         elm::Element *m_focusedElement = nullptr;
         elm::Element *m_topElement = nullptr;
         elm::Element *m_bottomElement = nullptr;
-        
+
         bool m_initialFocusSet = false;
         
         friend class Overlay;
@@ -4764,6 +4780,7 @@ namespace tsl {
          * @return Whether or not the input has been consumed
          */
         void handleInput(u64 keysDown, u64 keysHeld, bool touchDetected, const HidTouchState &touchPos, HidAnalogStickState joyStickPosLeft, HidAnalogStickState joyStickPosRight) {
+            // Static variables to maintain state between function calls
             static HidTouchState initialTouchPos = { 0 };
             static HidTouchState oldTouchPos = { 0 };
             static bool oldTouchDetected = false;
@@ -4773,25 +4790,31 @@ namespace tsl {
             
             auto& currentGui = this->getCurrentGui();
             
+            // Return early if current GUI is not available
             if (currentGui == nullptr)
                 return;
             
+            // Retrieve current focus and top/bottom elements of the GUI
             auto currentFocus = currentGui->getFocusedElement();
-            static auto lastFocus = currentFocus;
             auto topElement = currentGui->getTopElement();
-            auto bottomElement = currentGui->getBottomElement(); // backend is still not implemented/working yet
+            auto bottomElement = currentGui->getBottomElement(); // Backend is still not implemented/working yet
             
 
-            if (currentFocus == nullptr  && !simulatedBack && simulatedBackComplete && !stillTouching) {
+            // Handle input when no element is focused
+            if (currentFocus == nullptr  && !simulatedBack && simulatedBackComplete && !stillTouching && !runningInterpreter.load(std::memory_order_acquire)) {
+                // Check for back button press
                 if (keysDown & HidNpadButton_B) {
+                    // Handle back button press
                     if (!currentGui->handleInput(HidNpadButton_B, 0,{},{},{}))
                         this->goBack();
                     return;
                 }
                 
+                // If there is no top element, return early
                 if (topElement == nullptr)
                     return;
                 else if (currentGui != nullptr) {
+                    // Set focus to top element if initial focus is not set or arrow keys are pressed
                     if (!currentGui->initialFocusSet() || keysDown & (HidNpadButton_AnyUp | HidNpadButton_AnyDown | HidNpadButton_AnyLeft | HidNpadButton_AnyRight)) {
                         currentGui->requestFocus(topElement, FocusDirection::None);
                         currentGui->markInitialFocusSet();
@@ -4800,41 +4823,52 @@ namespace tsl {
                 }
             }
 
-            // If nothing is highlighted AND the menu is fully loaded / drawn, set focus to topElement ( IMPLEMENBT THIS)
+            // If nothing is highlighted AND the menu is fully loaded/drawn, set focus to topElement
             if (!touchDetected && (!oldTouchDetected || (oldTouchEvent == elm::TouchEvent::Scroll)) && currentFocus == nullptr) {
                 if (!simulatedBack && simulatedBackComplete ) {
+                    //f (lastTouchedElement != nullptr) {
+                    //   currentGui->removeFocus();
+                    //   currentGui->requestFocus(lastTouchedElement, FocusDirection::None);
+                    //
+
                     if (topElement != nullptr) {
                         currentGui->removeFocus();
                         currentGui->requestFocus(topElement, FocusDirection::None);
                     }
                 }
             }
-
             
             bool handled = false;
             elm::Element *parentElement = currentFocus;
             
+            // Propagate click events upwards through the hierarchy
             while (!handled && parentElement != nullptr) {
                 handled = parentElement->onClick(keysDown);
                 parentElement = parentElement->getParent();
             }
             
             parentElement = currentFocus;
+            // Propagate input events upwards through the hierarchy
             while (!handled && parentElement != nullptr) {
                 handled = parentElement->handleInput(keysDown, keysHeld, touchPos, joyStickPosLeft, joyStickPosRight);
                 parentElement = parentElement->getParent();
             }
             
+            // Return early if the GUI has changed
             if (currentGui != this->getCurrentGui())
                 return;
             
+            // Handle input events for the current GUI
             handled = handled | currentGui->handleInput(keysDown, keysHeld, touchPos, joyStickPosLeft, joyStickPosRight);
             
-            if (!touchDetected && !oldTouchDetected && !handled && currentFocus != nullptr && !stillTouching) {
+            // Handle arrow key navigation when no touch input is detected
+            if (!touchDetected && !oldTouchDetected && !handled && currentFocus != nullptr && !stillTouching && !runningInterpreter.load(std::memory_order_acquire)) {
                 static bool shouldShake = true;
                 
+                // Check for single arrow key press
                 if ((((keysHeld & HidNpadButton_AnyUp) != 0) + ((keysHeld & HidNpadButton_AnyDown) != 0) + ((keysHeld & HidNpadButton_AnyLeft) != 0) + ((keysHeld & HidNpadButton_AnyRight) != 0)) == 1) {
                     if ((repeatTick == 0 || repeatTick > 20) && (repeatTick % 4) == 0) {
+                        // Request focus based on arrow key direction
                         if (keysHeld & HidNpadButton_AnyUp)
                             currentGui->requestFocus(currentGui->getTopElement(), FocusDirection::Up, shouldShake); // Request focus on the top element when double-clicking up
                         else if (keysHeld & HidNpadButton_AnyDown)
@@ -4848,88 +4882,50 @@ namespace tsl {
                     }
                     repeatTick++;
                 } else {
+                    // Handle back button press
                     if (keysDown & HidNpadButton_B)
                         this->goBack();
                     repeatTick = 0;
                     shouldShake = true;
                 }
             }
-        
-            static u64 lastUpPressTimestamp = 0; // Store the timestamp of the last up button press
-            
-            // Define a threshold for double-click timing (in milliseconds)
-            constexpr u64 DOUBLE_CLICK_THRESHOLD_MS = 170;
-        
-            // If the up button is pressed
-            if (!touchDetected && keysDown & HidNpadButton_AnyUp) {
-                // Get the current time using high_resolution_clock
-                auto currentTime = std::chrono::high_resolution_clock::now();
-                
-                // Convert the time point to milliseconds
-                auto currentTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch()).count();
-        
-                // Calculate the time since the last up button press
-                u64 timeSinceLastUpPress = currentTimestamp - lastUpPressTimestamp;
-        
-                // If the time since the last up press is within the threshold for a double-click
-                if (timeSinceLastUpPress <= DOUBLE_CLICK_THRESHOLD_MS) {
-                    // Perform action for double-clicking up (shift focus to top element)
-                    topElement = currentGui->getTopElement();
-                    if (topElement != nullptr) {
-                        currentGui->requestFocus(topElement, FocusDirection::None);
-                    }
-                    // Reset the last up press timestamp after successful double-click action
-                    lastUpPressTimestamp = 0;
-                } else {
-                    // Update the last up press timestamp if not within the double-click threshold
-                    lastUpPressTimestamp = currentTimestamp;
+
+            // If the up button is pressed, shift focus to the top element
+            if (!touchDetected && keysDown & HidNpadButton_L && !runningInterpreter.load(std::memory_order_acquire)) {
+                topElement = currentGui->getTopElement();
+                if (topElement != nullptr) {
+                    currentGui->requestFocus(topElement, FocusDirection::None);
                 }
             }
 
-            static u64 lastDownPressTimestamp = 0;
-
-            // If the down button is pressed
-            if (keysDown & HidNpadButton_AnyDown) {
-                // Get the current time using high_resolution_clock
-                auto currentTime = std::chrono::high_resolution_clock::now();
-                
-                // Convert the time point to milliseconds
-                auto currentTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch()).count();
-        
-                // Calculate the time since the last up button press
-                u64 timeSinceLastDownPress = currentTimestamp - lastDownPressTimestamp;
-        
-                // If the time since the last up press is within the threshold for a double-click
-                if (timeSinceLastDownPress <= DOUBLE_CLICK_THRESHOLD_MS) {
-                    // Perform action for double-clicking up (shift focus to top element)
-                    bottomElement = currentGui->getBottomElement();
-                    if (bottomElement != nullptr) {
-                        currentGui->requestFocus(bottomElement, FocusDirection::None);
-                    }
-                    // Reset the last up press timestamp after successful double-click action
-                    lastDownPressTimestamp = 0;
-                } else {
-                    // Update the last up press timestamp if not within the double-click threshold
-                    lastDownPressTimestamp = currentTimestamp;
+            // If the down button is pressed, shift focus to the bottom element
+            if (!touchDetected && keysDown & HidNpadButton_R && !runningInterpreter.load(std::memory_order_acquire)) {
+                bottomElement = currentGui->getBottomElement();
+                if (bottomElement != nullptr) {
+                    currentGui->requestFocus(bottomElement, FocusDirection::None);
                 }
             }
             
-
+            // Handle touch release event
             if (!touchDetected && oldTouchDetected) {
-                if (currentGui != nullptr && topElement != nullptr)
+                if (currentGui != nullptr && topElement != nullptr) {
                     topElement->onTouch(elm::TouchEvent::Release, oldTouchPos.x, oldTouchPos.y, oldTouchPos.x, oldTouchPos.y, initialTouchPos.x, initialTouchPos.y);
+                }
             }
             
+            // Handle touch input
             if (touchDetected) {
                 if (!interruptedTouch)
                     interruptedTouch = ((keysHeld & ALL_KEYS_MASK) != 0);
 
+                // Calculate touch distance
                 u32 xDistance = std::abs(static_cast<s32>(initialTouchPos.x) - static_cast<s32>(touchPos.x));
                 u32 yDistance = std::abs(static_cast<s32>(initialTouchPos.y) - static_cast<s32>(touchPos.y));
                 
                 xDistance *= xDistance;
                 yDistance *= yDistance;
                 
+                // Determine touch event type (scroll or hold)
                 if ((xDistance + yDistance) > 1000) {
                     elm::Element::setInputMode(InputMode::TouchScroll);
                     touchEvent = elm::TouchEvent::Scroll;
@@ -4938,28 +4934,55 @@ namespace tsl {
                         touchEvent = elm::TouchEvent::Hold;
                 }
 
-                // CUSTOM MODIFICATION START
+                // Handle touch input initiation
                 if (!oldTouchDetected) {
                     initialTouchPos = touchPos;
                     elm::Element::setInputMode(InputMode::Touch);
-                    if (currentFocus != nullptr)
-                        lastFocus = currentFocus;
-                    if (initialTouchPos.y <= cfg::FramebufferHeight - 73U && initialTouchPos.y > 73U && initialTouchPos.x <= cfg::FramebufferWidth && initialTouchPos.x > 0U) {
-                        touchInBounds = true;
-                        currentGui->removeFocus();
-                    } else {
-                        touchInBounds = false;
+                    if (!runningInterpreter.load(std::memory_order_acquire)) {
+                        if (initialTouchPos.y <= cfg::FramebufferHeight - 73U && initialTouchPos.y > 73U && initialTouchPos.x <= cfg::FramebufferWidth && initialTouchPos.x > 0U) {
+                            touchInBounds = true;
+                            currentGui->removeFocus();
+                        } else {
+                            touchInBounds = false;
+                        }
                     }
                     touchEvent = elm::TouchEvent::Touch;
                 }
                 
-                // CUSTOM MODIFICATION END
-                
+                // Call onTouch method for the top element to handle touch event
                 if (currentGui != nullptr && topElement != nullptr) {
-                    topElement->onTouch(touchEvent, touchPos.x, touchPos.y, oldTouchPos.x, oldTouchPos.y, initialTouchPos.x, initialTouchPos.y);
+                    if (!runningInterpreter.load(std::memory_order_acquire)) {
+                        topElement->onTouch(touchEvent, touchPos.x, touchPos.y, oldTouchPos.x, oldTouchPos.y, initialTouchPos.x, initialTouchPos.y);
+                        if (currentFocus != nullptr && touchEvent != elm::TouchEvent::Scroll)
+                            currentGui->requestFocus(currentFocus, FocusDirection::None);
+                        else
+                            currentGui->removeFocus();
+                    }
+                    //// Check if the top element contains the touch position
+                    //if (topElement->inBounds(touchPos.x, touchPos.y)) {
+                    //    // Request focus for the top element
+                    //    currentGui->requestFocus(topElement, FocusDirection::None);
+                    //} else {
+                    //    // Iterate through elements to find the touched element
+                    //    for (auto &element : currentGui->getTopElement()->getChildren()) {
+                    //        if (element->inBounds(touchPos.x, touchPos.y)) {
+                    //            // Determine the direction to move
+                    //            FocusDirection direction = (element->getY() < touchPos.y) ? FocusDirection::Down : FocusDirection::Up;
+                    //
+                    //            // Request focus for the touched element in the specified direction
+                    //            currentGui->requestFocus(element, direction);
+                    //            // Set the top element to the touched element
+                    //            topElement = element;
+                    //            break;
+                    //        }
+                    //    }
+                    //}
                 }
 
-                
+
+
+
+                // Update old touch position
                 oldTouchPos = touchPos;
                 
                 // Hide overlay when touching out of bounds
@@ -4973,29 +4996,26 @@ namespace tsl {
                 }
                 stillTouching = true;
             } else {
-                if (!interruptedTouch) {
-                    // Location of back touch button
+                if (!interruptedTouch && !runningInterpreter.load(std::memory_order_acquire)) {
+                    // Check touch button locations for specific actions
                     if (oldTouchPos.x < 150U && oldTouchPos.y > cfg::FramebufferHeight - 73U) {
                         if (initialTouchPos.x < 150U && initialTouchPos.y > cfg::FramebufferHeight - 73U) {
                             simulatedBackComplete = false;
                             simulatedBack = true;
                         }
                     }
-                    // Location of select touch button
                     if (oldTouchPos.x >= 150U && oldTouchPos.x < 260U && oldTouchPos.y > cfg::FramebufferHeight - 73U) {
                         if (initialTouchPos.x >= 150U && initialTouchPos.x < 260U && initialTouchPos.y > cfg::FramebufferHeight - 73U) {
                             simulatedSelectComplete = false;
                             simulatedSelect = true;
                         }
                     }
-                    // Location of next page touch button
                     if (oldTouchPos.x >= 260U && oldTouchPos.x <= cfg::FramebufferWidth && oldTouchPos.y > cfg::FramebufferHeight - 73U) {
                         if (initialTouchPos.x >= 260U && initialTouchPos.x <= cfg::FramebufferWidth && initialTouchPos.y > cfg::FramebufferHeight - 73U) {
                             simulatedNextPageComplete = false;
                             simulatedNextPage = true;
                         }
                     }
-                    // Location of menu touch button
                     if (oldTouchPos.x > 0U && oldTouchPos.x <= cfg::FramebufferWidth && oldTouchPos.y > 0U && oldTouchPos.y <= 73U) {
                         if (initialTouchPos.x > 0U && initialTouchPos.x <= cfg::FramebufferWidth && initialTouchPos.y > 0U && initialTouchPos.y <= 73U) {
                             simulatedMenuComplete = false;
@@ -5004,8 +5024,10 @@ namespace tsl {
                     }
                 }
                 
+                // Set input mode to controller when touch input ends
                 elm::Element::setInputMode(InputMode::Controller);
                 
+                // Reset touch-related variables
                 oldTouchPos = { 0 };
                 initialTouchPos = { 0 };
                 touchEvent = elm::TouchEvent::None;
