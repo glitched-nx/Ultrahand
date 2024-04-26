@@ -866,6 +866,11 @@ std::vector<std::vector<std::string>> getSourceReplacement(const std::vector<std
                     endPos = modifiedArg.find(")}");
                     if (endPos != std::string::npos && endPos > startPos) {
                         replacement = stringToList(listString)[entryIndex];
+                        if (replacement.empty()) {
+                            replacement = "null";
+                            modifiedArg.replace(startPos, endPos - startPos + 2, replacement);
+                            break;
+                        }
                         modifiedArg.replace(startPos, endPos - startPos + 2, replacement);
                     }
                     if (modifiedArg == lastArg)
@@ -878,6 +883,11 @@ std::vector<std::vector<std::string>> getSourceReplacement(const std::vector<std
                     endPos = modifiedArg.find(")}");
                     if (endPos != std::string::npos && endPos > startPos) {
                         replacement = replaceJsonPlaceholder(modifiedArg.substr(startPos, endPos - startPos + 2), "json_source", jsonString);
+                        if (replacement.empty()) {
+                            replacement = "null";
+                            modifiedArg.replace(startPos, endPos - startPos + 2, replacement);
+                            break;
+                        }
                         modifiedArg.replace(startPos, endPos - startPos + 2, replacement);
                     }
                     if (modifiedArg == lastArg)
@@ -890,6 +900,11 @@ std::vector<std::vector<std::string>> getSourceReplacement(const std::vector<std
                     endPos = modifiedArg.find(")}");
                     if (endPos != std::string::npos && endPos > startPos) {
                         replacement = replaceJsonPlaceholder(modifiedArg.substr(startPos, endPos - startPos + 2), "json_file_source", jsonPath);
+                        if (replacement.empty()) {
+                            replacement = "null";
+                            modifiedArg.replace(startPos, endPos - startPos + 2, replacement);
+                            break;
+                        }
                         modifiedArg.replace(startPos, endPos - startPos + 2, replacement);
                     }
                     if (modifiedArg == lastArg)
@@ -909,7 +924,7 @@ std::vector<std::vector<std::string>> getSourceReplacement(const std::vector<std
 
 // forward declarartion
 void processCommand(const std::vector<std::string>& cmd, const std::string& packagePath, const std::string& selectedCommand);
-
+//void enqueueCommand(std::vector<std::string>&& command, const std::string& packagePath, const std::string& selectedCommand);
 
 /**
  * @brief Interpret and execute a list of commands.
@@ -991,8 +1006,16 @@ void interpretAndExecuteCommand(std::vector<std::vector<std::string>>&& commands
                         endPos = arg.find(")}");
                         if (endPos != std::string::npos && endPos > startPos) {
                             replacement = replaceHexPlaceholder(arg.substr(startPos, endPos - startPos + 2), hexPath);
+                            if (replacement.empty()) {
+                                replacement = "null";
+                                arg.replace(startPos, endPos - startPos + 2, replacement);
+                                break;
+                            }
+
                             arg.replace(startPos, endPos - startPos + 2, replacement);
                             if (arg == lastArg) {
+                                if (interpreterLogging)
+                                    logMessage("failed replacement ard: "+arg);
                                 arg.replace(startPos, endPos - startPos + 2, "null"); // fall back replacement value of null
                                 commandSuccess = false;
                                 break;
@@ -1006,8 +1029,19 @@ void interpretAndExecuteCommand(std::vector<std::vector<std::string>>&& commands
                         endPos = arg.find(")}");
                         if (endPos != std::string::npos && endPos > startPos) {
                             replacement = replaceIniPlaceholder(arg.substr(startPos, endPos - startPos + 2), iniPath);
+
+                            if (replacement.empty()) {
+                                replacement = "null";
+                                arg.replace(startPos, endPos - startPos + 2, replacement);
+                                break;
+                            }
+
                             arg.replace(startPos, endPos - startPos + 2, replacement);
+                            
+
                             if (arg == lastArg) {
+                                if (interpreterLogging)
+                                    logMessage("failed replacement ard: "+arg);
                                 arg.replace(startPos, endPos - startPos + 2, "null"); // fall back replacement value of null
                                 commandSuccess = false;
                                 break;
@@ -1022,8 +1056,16 @@ void interpretAndExecuteCommand(std::vector<std::vector<std::string>>&& commands
                         if (endPos != std::string::npos && endPos > startPos) {
                             listIndex = std::stoi(arg.substr(startPos, endPos - startPos + 2));
                             replacement = stringToList(listString)[listIndex];
+                            if (replacement.empty()) {
+                                replacement = "null";
+                                arg.replace(startPos, endPos - startPos + 2, replacement);
+                                break;
+                            }
+
                             arg.replace(startPos, endPos - startPos + 2, replacement);
                             if (arg == lastArg) {
+                                if (interpreterLogging)
+                                    logMessage("failed replacement ard: "+arg);
                                 arg.replace(startPos, endPos - startPos + 2, "null"); // fall back replacement value of null
                                 commandSuccess = false;
                                 break;
@@ -1037,8 +1079,16 @@ void interpretAndExecuteCommand(std::vector<std::vector<std::string>>&& commands
                         endPos = arg.find(")}");
                         if (endPos != std::string::npos && endPos > startPos) {
                             replacement = replaceJsonPlaceholder(arg.substr(startPos, endPos - startPos + 2), "json", jsonString);
+                            if (replacement.empty()) {
+                                replacement = UNAVAILABLE_SELECTION;
+                                arg.replace(startPos, endPos - startPos + 2, replacement);
+                                break;
+                            }
+
                             arg.replace(startPos, endPos - startPos + 2, replacement);
                             if (arg == lastArg) {
+                                if (interpreterLogging)
+                                    logMessage("failed replacement ard: "+arg);
                                 arg.replace(startPos, endPos - startPos + 2, UNAVAILABLE_SELECTION); // fall back replacement value of `UNAVAILABLE_SELECTION`
                                 commandSuccess = false;
                                 break;
@@ -1054,8 +1104,11 @@ void interpretAndExecuteCommand(std::vector<std::vector<std::string>>&& commands
                             replacement = replaceJsonPlaceholder(arg.substr(startPos, endPos - startPos + 2), "json_file", jsonPath);
                             arg.replace(startPos, endPos - startPos + 2, replacement);
                             if (arg == lastArg) {
+                                if (interpreterLogging)
+                                    logMessage("failed replacement ard: "+arg);
                                 arg.replace(startPos, endPos - startPos + 2, UNAVAILABLE_SELECTION); // fall back replacement value of `UNAVAILABLE_SELECTION`
                                 commandSuccess = false;
+
                                 break;
                             }
                         } else
@@ -1063,6 +1116,13 @@ void interpretAndExecuteCommand(std::vector<std::vector<std::string>>&& commands
                         lastArg = arg;
                     }
                     // Similar optimization for other replacements
+                }
+
+                if (interpreterLogging) {
+                    std::string message = "Executing command: ";
+                    for (const std::string& token : cmd)
+                        message += token + " ";
+                    logMessage(message);
                 }
 
                 const size_t cmdSize = cmd.size();
@@ -1089,13 +1149,7 @@ void interpretAndExecuteCommand(std::vector<std::vector<std::string>>&& commands
                     }
                 } else {
                     processCommand(cmd, packagePath, selectedCommand);
-                }
-
-                if (interpreterLogging) {
-                    std::string message = "Executing command: ";
-                    for (const std::string& token : cmd)
-                        message += token + " ";
-                    logMessage(message);
+                    //enqueueCommand(std::move(cmd), packagePath, selectedCommand);
                 }
             }
         }
@@ -1103,8 +1157,6 @@ void interpretAndExecuteCommand(std::vector<std::vector<std::string>>&& commands
         commands.erase(commands.begin()); // Remove processed command
     }
 }
-
-
 
 
 
@@ -1327,12 +1379,13 @@ void processCommand(const std::vector<std::string>& cmd, const std::string& pack
                 bool resetCommandSuccess;
                 for (auto& bootOption:bootOptions) {
                     bootOptionName = bootOption.first;
-                    auto& bootCommands = bootOption.second;
+                    auto bootCommands = bootOption.second;
                     if (bootOptionName == bootCommandName) {
                         resetCommandSuccess = false;
                         if (!commandSuccess)
                             resetCommandSuccess = true;
                         interpretAndExecuteCommand(std::move(bootCommands), packagePath+bootPackageFileName, bootOptionName); // Execute modified 
+                        //enqueueInterpreterCommand(std::move(bootCommands), packagePath+bootPackageFileName, bootOptionName);
                         if (resetCommandSuccess) {
                             commandSuccess = false;
                             resetCommandSuccess = false;
@@ -1490,13 +1543,14 @@ std::condition_variable queueCondition;
 static bool interpreterThreadExit = false;
 
 void clearInterpreterFlags() {
-    threadFailure.store(false, std::memory_order_release);
     runningInterpreter.store(false, std::memory_order_release);
     abortDownload.store(false, std::memory_order_release);
     abortUnzip.store(false, std::memory_order_release);
     abortFileOp.store(false, std::memory_order_release);
     abortCommand.store(false, std::memory_order_release);
 }
+
+
 
 void backgroundInterpreter(void*) {
     try {
@@ -1516,6 +1570,7 @@ void backgroundInterpreter(void*) {
             if (!std::get<0>(args).empty()) {
                 // Clear flags and perform any cleanup if necessary
                 clearInterpreterFlags();
+                threadFailure.store(false, std::memory_order_release);
                 runningInterpreter.store(true, std::memory_order_release);
 
                 interpretAndExecuteCommand(std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::move(std::get<2>(args)));
@@ -1532,33 +1587,13 @@ void backgroundInterpreter(void*) {
             interpreterQueue.pop();
         }
         clearInterpreterFlags();
-        threadFailure.store(true, std::memory_order_release);
         runningInterpreter.store(false, std::memory_order_release);
+        threadFailure.store(true, std::memory_order_release);
         logMessage("Interpreter failure.");
+        //closeInterpreterThread();
         // Optionally, log the exception or perform additional cleanup
     }
 }
-
-
-void startInterpreterThread() {
-    interpreterThreadExit = false;
-    int result = threadCreate(&interpreterThread, backgroundInterpreter, nullptr, nullptr, 0x8000, 0x10, -2);
-    if (result != 0) {
-        // Failed to create thread, clear the queue and reset flags
-        std::lock_guard<std::mutex> lock(queueMutex);
-        while (!interpreterQueue.empty()) {
-            interpreterQueue.pop();
-        }
-        clearInterpreterFlags();
-        threadFailure.store(true, std::memory_order_release);
-        runningInterpreter.store(false, std::memory_order_release);
-        logMessage("Failed to create interpreter thread.");
-        return;
-    }
-    threadStart(&interpreterThread);
-}
-
-
 
 void closeInterpreterThread() {
     logMessage("Closing interpreter...");
@@ -1574,14 +1609,146 @@ void closeInterpreterThread() {
     logMessage("Interpreter has been closed.");
 }
 
+
+
+void startInterpreterThread(int stackSize = 0x12000) {
+    interpreterThreadExit = false;
+    int result = threadCreate(&interpreterThread, backgroundInterpreter, nullptr, nullptr, stackSize, 0x10, 1);
+    if (result != 0) {
+        // Failed to create thread, clear the queue and reset flags
+        std::lock_guard<std::mutex> lock(queueMutex);
+        while (!interpreterQueue.empty()) {
+            interpreterQueue.pop();
+        }
+        clearInterpreterFlags();
+        runningInterpreter.store(false, std::memory_order_release);
+        threadFailure.store(true, std::memory_order_release);
+        logMessage("Failed to create interpreter thread.");
+        return;
+    }
+    threadStart(&interpreterThread);
+}
+
+
+
+
 void enqueueInterpreterCommand(std::vector<std::vector<std::string>>&& commands, const std::string& packagePath, const std::string& selectedCommand) {
-    startInterpreterThread();
     {
         std::lock_guard<std::mutex> lock(queueMutex);
         interpreterQueue.emplace(std::move(commands), packagePath, selectedCommand);
+    }
+
+    // Check if the interpreter thread is running
+    if (!interpreterThreadExit) {
+        // Close the interpreter thread if it's running
+        closeInterpreterThread();
+    }
+
+    // Start a new interpreter thread
+    if (isDownloadCommand) {
+        startInterpreterThread(0x8000);
+    } else {
+        startInterpreterThread();
     }
     queueCondition.notify_one();
 }
 
 
 
+
+// Thread information structure
+//Thread commandThread;
+//std::queue<std::tuple<std::vector<std::string>, std::string, std::string>> commandQueue;
+//std::mutex commandQueueMutex;
+//std::condition_variable commandQueueCondition;
+//static bool commandThreadExit = false;
+//
+//
+//
+//void backgroundCommand(void*) {
+//    try {
+//        while (!commandThreadExit) {
+//            std::tuple<std::vector<std::string>, std::string, std::string> args;
+//
+//            {
+//                std::unique_lock<std::mutex> lock(commandQueueMutex);
+//                commandQueueCondition.wait(lock, [] { return !commandQueue.empty() || commandThreadExit; });
+//
+//                if (!commandQueue.empty()) {
+//                    args = std::move(commandQueue.front());
+//                    commandQueue.pop();
+//                }
+//            } // Release the lock before processing the command
+//
+//            if (!std::get<0>(args).empty()) {
+//                processCommand(std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::move(std::get<2>(args)));
+//            }
+//        }
+//    } catch (...) {
+//        // Exception occurred, clear the queue and reset flags
+//        std::lock_guard<std::mutex> lock(commandQueueMutex);
+//        while (!commandQueue.empty()) {
+//            commandQueue.pop();
+//        }
+//        logMessage("Command failure.");
+//        // Optionally, log the exception or perform additional cleanup
+//    }
+//}
+//
+//
+//void startCommandThread() {
+//    commandThreadExit = false;
+//    int result = threadCreate(&commandThread, backgroundCommand, nullptr, nullptr, 0x4000, 0x10, -2);
+//    if (result != 0) {
+//        // Failed to create thread, clear the queue and reset flags
+//        std::lock_guard<std::mutex> lock(commandQueueMutex);
+//        while (!commandQueue.empty()) {
+//            commandQueue.pop();
+//        }
+//        logMessage("Failed to create command thread.");
+//        return;
+//    }
+//    threadStart(&commandThread);
+//}
+//
+//
+//
+//void closeCommandThread() {
+//    logMessage("Closing command...");
+//    {
+//        std::lock_guard<std::mutex> lock(commandQueueMutex);
+//        commandThreadExit = true;
+//        commandQueueCondition.notify_one();
+//    }
+//    threadWaitForExit(&commandThread);
+//    threadClose(&commandThread);
+//    logMessage("Command has been closed.");
+//}
+//
+//void enqueueCommand(std::vector<std::string>&& command, const std::string& packagePath, const std::string& selectedCommand) {
+//    startCommandThread(); // Start the command thread if it's not already running
+//
+//    // Enqueue the command
+//    {
+//        std::lock_guard<std::mutex> lock(commandQueueMutex);
+//        commandQueue.emplace(std::move(command), packagePath, selectedCommand);
+//    }
+//    commandQueueCondition.notify_one(); // Notify the command thread that a new command is available
+//
+//    // Wait for the command thread to complete execution
+//    while (true) {
+//        {
+//            std::lock_guard<std::mutex> lock(commandQueueMutex);
+//            if (commandQueue.empty()) {
+//                break; // If the queue is empty, the command thread has completed
+//            }
+//        }
+//        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Wait for 100 milliseconds before checking again
+//    }
+//
+//    // Close the command thread
+//    closeCommandThread();
+//}
+//
+//
+//
