@@ -590,8 +590,8 @@ void localizeTimeStr(char* timeStr) {
 // Map of character widths
 static std::unordered_map<char, float> characterWidths = {
     {'°', 0.25},
-    {'%', 0.98}, // not calibrated
-    {':', 0.25}, // not calibrated
+    {'%', 0.98}, // nicht kalibriert
+    {':', 0.25}, // nicht kalibriert
     {' ', 0.3},
     {'+', 0.75},
     {'-', 0.36},
@@ -2838,10 +2838,11 @@ namespace tsl {
             std::string SOC_temperatureStringSTD;
             std::string menuBottomLine;
             
-            
+
             OverlayFrame(const std::string& title, const std::string& subtitle, const std::string& menuMode = "", const std::string& colorSelection = "", const std::string& pageLeftName = "", const std::string& pageRightName = "")
-                : Element(), m_menuMode(menuMode), m_title(title), m_subtitle(subtitle), m_colorSelection(colorSelection), m_pageLeftName(pageLeftName), m_pageRightName(pageRightName) {} // CUSTOM MODIFICATION
-            
+                : Element(), m_title(title), m_subtitle(subtitle), m_menuMode(menuMode), m_colorSelection(colorSelection), m_pageLeftName(pageLeftName), m_pageRightName(pageRightName) {} // CUSTOM MODIFICATION
+
+
             virtual ~OverlayFrame() {
                 if (this->m_contentElement != nullptr)
                     delete this->m_contentElement;

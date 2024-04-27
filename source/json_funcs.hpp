@@ -45,7 +45,7 @@ json_t* readJsonFromFile(const std::string& filePath) {
     }
     
     // Get the file size
-    size_t fileSize = fileStat.st_size;
+    //size_t fileSize = fileStat.st_size;
     
     // Use a fixed-size buffer for reading file content
     constexpr size_t bufferSize = 4096; // Choose an appropriate buffer size
