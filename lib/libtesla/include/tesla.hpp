@@ -2838,7 +2838,7 @@ namespace tsl {
             std::string SOC_temperatureStringSTD;
             std::string menuBottomLine;
             
-
+            
             /// @brief 
             /// @param title 
             /// @param subtitle 
