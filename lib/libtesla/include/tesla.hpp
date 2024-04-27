@@ -2839,8 +2839,14 @@ namespace tsl {
             std::string menuBottomLine;
             
 
-            OverlayFrame(const std::string& title, const std::string& subtitle, const std::string& menuMode = "", const std::string& colorSelection = "", const std::string& pageLeftName = "", const std::string& pageRightName = "")
-                : Element(), m_title(title), m_subtitle(subtitle), m_menuMode(menuMode), m_colorSelection(colorSelection), m_pageLeftName(pageLeftName), m_pageRightName(pageRightName) {} // CUSTOM MODIFICATION
+            /// @brief 
+            /// @param title 
+            /// @param subtitle 
+            /// @param menuMode 
+            /// @param colorSelection 
+            /// @param pageLeftName 
+            /// @param pageRightName 
+            OverlayFrame(const std::string& title, const std::string& subtitle, const std::string& menuMode = "", const std::string& colorSelection = "", const std::string& pageLeftName = "", const std::string& pageRightName = "") : m_title(title), m_subtitle(subtitle), m_menuMode(menuMode), m_colorSelection(colorSelection), m_pageLeftName(pageLeftName), m_pageRightName(pageRightName) {}
 
 
             virtual ~OverlayFrame() {
