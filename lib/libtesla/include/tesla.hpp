@@ -2778,22 +2778,35 @@ namespace tsl {
         // CUSTOM SECTION END
         
         /**
-         * @brief The base frame which can contain another view
-         *
-         */
+                   * @brief The base frame which can contain another view
+                   *
+                   */
         class OverlayFrame : public Element {
         public:
-            /**
-             * @brief Constructor
-             *
-             * @param title Name of the Overlay drawn bolt at the top
-             * @param subtitle Subtitle drawn bellow the title e.g version number
-             */
+            // Member-Variablen in der korrigierten Reihenfolge
+            std::string m_title;
+            std::string m_subtitle;
             std::string m_menuMode; // CUSTOM MODIFICATION
             std::string m_colorSelection; // CUSTOM MODIFICATION
             std::string m_pageLeftName; // CUSTOM MODIFICATION
             std::string m_pageRightName; // CUSTOM MODIFICATION
-            
+
+            // ... other member declarations ...
+
+            /**
+                        * @brief Constructor
+                        *
+                        * @param title Name of the Overlay drawn bolt at the top
+                        * @param subtitle Subtitle drawn bellow the title e.g version number
+                        */
+        OverlayFrame(const std::string& title, const std::string& subtitle, const std::string& menuMode = "", const std::string& colorSelection = "", const std::string& pageLeftName = "", const std::string& pageRightName = "") : 
+            m_title(title), 
+            m_subtitle(subtitle), 
+            m_menuMode(menuMode), 
+            m_colorSelection(colorSelection), 
+            m_pageLeftName(pageLeftName), 
+            m_pageRightName(pageRightName) 
+          {}
             std::string disableColorfulLogoStr = parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "disable_colorful_logo");
             bool disableColorfulLogo = (!disableColorfulLogoStr.empty() && disableColorfulLogoStr == "true");
             tsl::Color logoColor1 = RGB888(parseValueFromIniSection("/config/ultrahand/theme.ini", "theme", "logo_color_1"), "#FFFFFF");
@@ -2838,16 +2851,6 @@ namespace tsl {
             std::string SOC_temperatureStringSTD;
             std::string menuBottomLine;
             
-            
-            /// @brief 
-            /// @param title 
-            /// @param subtitle 
-            /// @param menuMode 
-            /// @param colorSelection 
-            /// @param pageLeftName 
-            /// @param pageRightName 
-            OverlayFrame(const std::string& title, const std::string& subtitle, const std::string& menuMode = "", const std::string& colorSelection = "", const std::string& pageLeftName = "", const std::string& pageRightName = "") : m_title(title), m_subtitle(subtitle), m_menuMode(menuMode), m_colorSelection(colorSelection), m_pageLeftName(pageLeftName), m_pageRightName(pageRightName) {}
-
 
             virtual ~OverlayFrame() {
                 if (this->m_contentElement != nullptr)
