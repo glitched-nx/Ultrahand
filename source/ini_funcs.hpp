@@ -17,8 +17,7 @@
  ********************************************************************************/
 
 #pragma once
-#include <sys/stat.h>
-#include <cstdio>   // For FILE*, fopen(), fclose(), fprintf(), etc.
+#include <fstream>
 #include <cstring>  // For std::string, strlen(), etc.
 #include <string>   // For std::string
 #include <vector>   // For std::vector
@@ -29,8 +28,7 @@
 #include <get_funcs.hpp>
 #include <path_funcs.hpp>
 
-
-constexpr size_t BufferSize = 4096*3;//131072;
+//constexpr size_t BufferSize = 4096*3;//131072;
 
 /**
  * @brief Represents a package header structure.
@@ -64,6 +62,7 @@ struct PackageHeader {
  * @param filePath The path to the INI file.
  * @return The package header structure.
  */
+
 PackageHeader getPackageHeaderFromIni(const std::string& filePath) {
     PackageHeader packageHeader;
     
@@ -78,7 +77,7 @@ PackageHeader getPackageHeaderFromIni(const std::string& filePath) {
         return packageHeader;
     }
     
-    //constexpr size_t BufferSize = 4096; // Choose a larger buffer size for reading lines
+    constexpr size_t BufferSize = 1024; // Choose a larger buffer size for reading lines
     char line[BufferSize];
     
     const std::string titlePrefix = ";title=";
@@ -214,6 +213,7 @@ PackageHeader getPackageHeaderFromIni(const std::string& filePath) {
     return packageHeader;
 }
 
+
 /**
  * @brief Splits a string into a vector of substrings using a specified delimiter.
  *
@@ -268,6 +268,7 @@ static std::map<std::string, std::map<std::string, std::string>> parseIni(const 
     return iniData;
 }
 
+
 /**
  * @brief Parses an INI file and returns its content as a map of sections and key-value pairs.
  *
@@ -280,58 +281,34 @@ static std::map<std::string, std::map<std::string, std::string>> parseIni(const 
  */
 std::map<std::string, std::map<std::string, std::string>> getParsedDataFromIniFile(const std::string& configIniPath) {
     std::map<std::string, std::map<std::string, std::string>> parsedData;
-    std::string currentSection = ""; // Initialize the current section as empty
-    
-    FILE* configFileIn = fopen(configIniPath.c_str(), "rb");
-    if (!configFileIn) {
-        return parsedData;
+    std::ifstream configFile(configIniPath);
+    if (!configFile.is_open()) {
+        logMessage("Failed to open the file: " + configIniPath);
+        return parsedData; // Return empty map if file cannot be opened
     }
-    
-    // Determine the size of the INI file
-    fseek(configFileIn, 0, SEEK_END);
-    long fileSize = ftell(configFileIn);
-    rewind(configFileIn);
-    
-    // Read the contents of the INI file
-    char* fileData = new char[fileSize + 1];
-    fread(fileData, sizeof(char), fileSize, configFileIn);
-    fileData[fileSize] = '\0';  // Add null-terminator to create a C-string
-    fclose(configFileIn);
-    
-    // Parse the INI data
-    std::string fileDataString(fileData, fileSize);
-    
-    // Normalize line endings to \n
-    fileDataString.erase(std::remove(fileDataString.begin(), fileDataString.end(), '\r'), fileDataString.end());
-    
-    // Split lines and parse
-    std::istringstream fileStream(fileDataString);
+
     std::string line;
-    size_t delimiterPos;
-    std::string key, value;
-    while (std::getline(fileStream, line)) {
-        // Remove leading and trailing whitespace
-        line = trim(line);
-        
-        // Check if this line is a section
-        if (line.size() > 2 && line.front() == '[' && line.back() == ']') {
-            // Remove the brackets to get the section name
-            currentSection = line.substr(1, line.size() - 2);
+    std::string currentSection;
+
+    while (getline(configFile, line)) {
+        std::string trimmedLine = trim(line);
+        if (trimmedLine.empty()) {
+            continue;
+        }
+
+        // Check if the line contains a section header
+        if (trimmedLine.front() == '[' && trimmedLine.back() == ']') {
+            currentSection = trimmedLine.substr(1, trimmedLine.size() - 2);
         } else {
-            // If not a section, parse as key-value pair
-            delimiterPos = line.find('=');
+            size_t delimiterPos = trimmedLine.find('=');
             if (delimiterPos != std::string::npos) {
-                key = trim(line.substr(0, delimiterPos));
-                value = trim(line.substr(delimiterPos + 1));
-                
-                // Store in the current section
+                std::string key = trim(trimmedLine.substr(0, delimiterPos));
+                std::string value = trim(trimmedLine.substr(delimiterPos + 1));
                 parsedData[currentSection][key] = value;
             }
         }
     }
-    
-    delete[] fileData;
-    
+
     return parsedData;
 }
 
@@ -347,116 +324,115 @@ std::map<std::string, std::map<std::string, std::string>> getParsedDataFromIniFi
  */
 std::vector<std::string> parseSectionsFromIni(const std::string& filePath) {
     std::vector<std::string> sections;
-    
-    FILE* file = fopen(filePath.c_str(), "r");
-    if (file == nullptr) {
-        return sections; // Return an empty list if the file cannot be opened
+
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        logMessage("Failed to open the input file: ");
+        return sections; // Early return if the file cannot be opened
     }
-    
-    //constexpr size_t BufferSize = 4096;
-    char line[BufferSize];
-    
-    std::string trimmedLine;
-    while (fgets(line, sizeof(line), file)) {
-        trimmedLine = trim(std::string(line));
-        
-        if (!trimmedLine.empty() && trimmedLine[0] == '[' && trimmedLine.back() == ']') {
-            // Extract section name and add it to the list
+
+    std::string line;
+    while (std::getline(file, line)) {
+        std::string trimmedLine = trim(line);
+
+        // Check if the line contains a section header
+        if (!trimmedLine.empty() && trimmedLine.front() == '[' && trimmedLine.back() == ']') {
             std::string sectionName = trimmedLine.substr(1, trimmedLine.size() - 2);
             sections.push_back(sectionName);
         }
     }
-    
-    fclose(file);
+
+    // file will automatically close when it goes out of scope
     return sections;
 }
 
 
 
+/**
+ * @brief Parses a specific value from a section and key in an INI file.
+ *
+ * @param filePath The path to the INI file.
+ * @param sectionName The name of the section containing the desired key.
+ * @param keyName The name of the key whose value is to be retrieved.
+ * @return The value as a string, or an empty string if the key or section isn't found.
+ */
 std::string parseValueFromIniSection(const std::string& filePath, const std::string& sectionName, const std::string& keyName) {
-    std::string value = "";
-    
-    FILE* file = fopen(filePath.c_str(), "r");
-    if (file == nullptr) {
-        return value; // Return an empty string if the file cannot be opened
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        logMessage("Failed to open the file: " + filePath);
+        return ""; // Early return if the file cannot be opened
     }
-    
+
+    std::string line;
     std::string currentSection = "";
-    //constexpr size_t BufferSize = 4096;
-    char line[BufferSize];
-    
-    size_t delimiterPos;
-    
-    std::string trimmedLine;
-    std::string currentKey;
-    
-    while (fgets(line, sizeof(line), file)) {
-        trimmedLine = trim(std::string(line));
-        
-        if (!trimmedLine.empty()) {
-            if (trimmedLine[0] == '[' && trimmedLine.back() == ']') {
-                // This line is a section header
-                currentSection = trimmedLine.substr(1, trimmedLine.size() - 2);
-            } else if (currentSection == sectionName) {
-                // Check if the line is within the desired section and contains the desired key
-                delimiterPos = trimmedLine.find('=');
-                if (delimiterPos != std::string::npos) {
-                    currentKey = trim(trimmedLine.substr(0, delimiterPos));
-                    if (currentKey == keyName) {
-                        value = trim(trimmedLine.substr(delimiterPos + 1));
-                        break; // Found the key, exit the loop
-                    }
+
+    while (getline(file, line)) {
+        std::string trimmedLine = trim(line);
+
+        if (trimmedLine.empty()) {
+            continue;
+        }
+
+        if (trimmedLine.front() == '[' && trimmedLine.back() == ']') {
+            currentSection = trimmedLine.substr(1, trimmedLine.size() - 2);
+            if (currentSection != sectionName) {
+                continue; // Skip processing other sections
+            }
+        } else if (currentSection == sectionName) {
+            size_t delimiterPos = trimmedLine.find('=');
+            if (delimiterPos != std::string::npos) {
+                std::string currentKey = trim(trimmedLine.substr(0, delimiterPos));
+                if (currentKey == keyName) {
+                    return trim(trimmedLine.substr(delimiterPos + 1)); // Found the key, return the value
                 }
             }
         }
     }
-    
-    fclose(file);
-    
-    return value;
+
+    return ""; // Return an empty string if the key or section isn't found
 }
 
 
-std::string parseValueFromIniSectionF(FILE*& file, const std::string& filePath, const std::string& sectionName, const std::string& keyName) {
-    std::string value = "";
-    
-    //FILE* file = fopen(filePath.c_str(), "r");
-    if (file == nullptr) {
-        return value; // Return an empty string if the file cannot be opened
-    }
-    
-    std::string currentSection = "";
-    //constexpr size_t BufferSize = 4096;
-    char line[BufferSize];
-    
-    std::string trimmedLine;
-    size_t delimiterPos;
-    
-    while (fgets(line, sizeof(line), file)) {
-        trimmedLine = trim(std::string(line));
-        
-        if (!trimmedLine.empty()) {
-            if (trimmedLine[0] == '[' && trimmedLine.back() == ']') {
-                // This line is a section header
-                currentSection = trimmedLine.substr(1, trimmedLine.size() - 2);
-            } else if (currentSection == sectionName) {
-                // Check if the line is within the desired section and contains the desired key
-                delimiterPos = trimmedLine.find('=');
-                if (delimiterPos != std::string::npos) {
-                    std::string currentKey = trim(trimmedLine.substr(0, delimiterPos));
-                    if (currentKey == keyName) {
-                        value = trim(trimmedLine.substr(delimiterPos + 1));
-                        break; // Found the key, exit the loop
-                    }
-                }
-            }
-        }
-    }
-    
-    //fclose(file);
-    
-    return value;
-}
+//std::string parseValueFromIniSectionF(FILE*& file, const std::string& filePath, const std::string& sectionName, const std::string& keyName) {
+//    std::string value = "";
+//    
+//    //FILE* file = fopen(filePath.c_str(), "r");
+//    if (file == nullptr) {
+//        return value; // Return an empty string if the file cannot be opened
+//    }
+//    
+//    std::string currentSection = "";
+//    //constexpr size_t BufferSize = 4096;
+//    char line[BufferSize];
+//    
+//    std::string trimmedLine;
+//    size_t delimiterPos;
+//    
+//    while (fgets(line, sizeof(line), file)) {
+//        trimmedLine = trim(std::string(line));
+//        
+//        if (!trimmedLine.empty()) {
+//            if (trimmedLine[0] == '[' && trimmedLine.back() == ']') {
+//                // This line is a section header
+//                currentSection = trimmedLine.substr(1, trimmedLine.size() - 2);
+//            } else if (currentSection == sectionName) {
+//                // Check if the line is within the desired section and contains the desired key
+//                delimiterPos = trimmedLine.find('=');
+//                if (delimiterPos != std::string::npos) {
+//                    std::string currentKey = trim(trimmedLine.substr(0, delimiterPos));
+//                    if (currentKey == keyName) {
+//                        value = trim(trimmedLine.substr(delimiterPos + 1));
+//                        break; // Found the key, exit the loop
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    
+//    //fclose(file);
+//    
+//    return value;
+//}
 
 
 
@@ -472,50 +448,46 @@ std::string parseValueFromIniSectionF(FILE*& file, const std::string& filePath, 
  * @param filePath The path to the INI file to be cleaned.
  */
 void cleanIniFormatting(const std::string& filePath) {
-    FILE* inputFile = fopen(filePath.c_str(), "r");
-    if (!inputFile) {
-        // Failed to open the input file
-        // Handle the error accordingly
-        return;
-    }
-    
     std::string tempPath = filePath + ".tmp";
-    FILE* outputFile = fopen(tempPath.c_str(), "w");
-    if (!outputFile) {
-        // Failed to create the output file
-        // Handle the error accordingly
-        fclose(inputFile);
+    std::ifstream inputFile(filePath);
+    if (!inputFile.is_open()) {
+        logMessage("Failed to open the input file: " + filePath);
         return;
     }
-    
-    bool isNewSection = false;
-    
-    //constexpr size_t BufferSize = 4096; // Choose a larger buffer size for reading lines
-    char line[BufferSize];
-    
-    std::string trimmedLine;
-    while (fgets(line, sizeof(line), inputFile)) {
-        trimmedLine = trim(std::string(line));
-        
+
+    std::ofstream outputFile(tempPath);
+    if (!outputFile.is_open()) {
+        logMessage("Failed to create the output file: " + tempPath);
+        return; // inputFile will automatically close
+    }
+
+    std::string line;
+    //bool isNewSection = false;
+    bool firstSectionFound = false;
+
+    while (getline(inputFile, line)) {
+        std::string trimmedLine = trim(line);
+
         if (!trimmedLine.empty()) {
-            if (trimmedLine[0] == '[' && trimmedLine[trimmedLine.length() - 1] == ']') {
-                if (isNewSection) {
-                    fprintf(outputFile, "\n");
+            // Add a newline before starting a new section, but not before the first section
+            if (trimmedLine.front() == '[' && trimmedLine.back() == ']') {
+                if (firstSectionFound) {
+                    outputFile << "\n"; // Add a newline before the section
+                } else {
+                    firstSectionFound = true; // Mark the first section as found
                 }
-                isNewSection = true;
             }
-            
-            fprintf(outputFile, "%s\n", trimmedLine.c_str());
+            outputFile << trimmedLine << "\n";
         }
     }
-    
-    fclose(inputFile);
-    fclose(outputFile);
-    
-    // Remove the original file and rename the temp file
-    remove(filePath.c_str());
-    rename(tempPath.c_str(), filePath.c_str());
+
+    // inputFile and outputFile will automatically close when they go out of scope
+
+    // Replace the original file with the cleaned up version
+    std::remove(filePath.c_str());
+    std::rename(tempPath.c_str(), filePath.c_str());
 }
+
 
 
 /**
@@ -532,132 +504,75 @@ void cleanIniFormatting(const std::string& filePath) {
  * @param desiredValue    The new value for the key-value pair.
  * @param desiredNewKey   (Optional) If provided, the function will rename the key while preserving the original value.
  */
-void setIniFile(const std::string& fileToEdit, const std::string& desiredSection, const std::string& desiredKey, const std::string& desiredValue, const std::string& desiredNewKey, const std::string& comment) {
-    FILE* configFile = fopen(fileToEdit.c_str(), "r");
-    if (!configFile) {
-        createDirectory(removeFilename(fileToEdit));
-        configFile = fopen(fileToEdit.c_str(), "w");
-        if (!configFile) {
-            // Handle the error accordingly
-            return;
-        }
-        fprintf(configFile, (comment+std::string("[%s]\n%s = %s\n")).c_str(), desiredSection.c_str(), desiredKey.c_str(), desiredValue.c_str());
-        fclose(configFile);
-        return;
-    }
-    
-    // Create a buffer to store the updated content
-    std::string updatedContent;
-    std::string currentSection;
-    std::string formattedDesiredValue = trim(desiredValue);
-    //constexpr size_t BufferSize = 4096;
-    char line[BufferSize];
-    
+void setIniFile(const std::string& fileToEdit, const std::string& desiredSection, const std::string& desiredKey, const std::string& desiredValue, const std::string& desiredNewKey = "", const std::string& comment = "") {
+    std::ifstream configFile(fileToEdit);
+    std::ostringstream updatedContent;
     bool sectionFound = false;
     bool keyFound = false;
-    bool addNewLine = false;
-    
-    std::string trimmedLine;
-    size_t delimiterPos;
-    std::string lineKey, originalValue;
-    
-    while (fgets(line, sizeof(line), configFile)) {
-        trimmedLine = trim(line);
-        
-        if (trimmedLine[0] == '[' && trimmedLine.back() == ']') {
-            currentSection = removeQuotes(trimmedLine.substr(1, trimmedLine.length() - 2));
-            if (sectionFound && !keyFound && desiredNewKey.empty()) {
-                if (!updatedContent.empty() && updatedContent.substr(updatedContent.length() - 2) == "\n\n") {
-                    updatedContent = updatedContent.substr(0, updatedContent.length() - 1);
-                    addNewLine = true;
-                }
-                updatedContent += desiredKey + "=" + formattedDesiredValue + "\n";
-                
-                if (addNewLine) { // if it ended with \n\n, add one more newline
-                    updatedContent += "\n";
-                    addNewLine = false;
-                }
-                keyFound = true;
-            }
-        }
-        
-        if (sectionFound && !keyFound && desiredNewKey.empty() && trim(currentSection) != trim(desiredSection)) {
-            if (!updatedContent.empty() && updatedContent.substr(updatedContent.length() - 2) == "\n\n") {
-                updatedContent = updatedContent.substr(0, updatedContent.length() - 1);
-                addNewLine = true;
-            }
-            updatedContent += desiredKey + "=" + formattedDesiredValue + "\n";
-            // Add a newline character if the last part of updatedContent initially had "\n"
-            if (addNewLine) {
-                updatedContent += "\n";
-                addNewLine = false;
-            }
-            keyFound = true;
-        }
-        
-        if (trim(currentSection) == trim(desiredSection)) {
-            sectionFound = true;
-            delimiterPos = trimmedLine.find('=');
-            
-            if (delimiterPos != std::string::npos) {
-                lineKey = trim(trimmedLine.substr(0, delimiterPos));
-                
-                if (lineKey == desiredKey) {
-                    keyFound = true;
-                    originalValue = getValueFromLine(trimmedLine);
-                    if (!updatedContent.empty() && updatedContent.substr(updatedContent.length() - 2) == "\n\n") {
-                        updatedContent = updatedContent.substr(0, updatedContent.length() - 1);
-                        addNewLine = true;
-                    }
-                    
-                    if (!desiredNewKey.empty()) {
-                        updatedContent += desiredNewKey + "=" + originalValue + "\n";
-                    } else {
-                        updatedContent += desiredKey + "=" + formattedDesiredValue + "\n";
-                    }
-                    
-                    // Add a newline character if the last part of updatedContent initially had "\n"
-                    if (addNewLine) {
-                        updatedContent += "\n";
-                        addNewLine = false;
-                    }
-                    continue;
-                }
-            }
-        }
-        
-        updatedContent += line;
-    }
-    
-    if (sectionFound && !keyFound && desiredNewKey.empty()) {
-        if (!updatedContent.empty() && updatedContent.substr(updatedContent.length() - 2) == "\n\n") {
-            updatedContent = updatedContent.substr(0, updatedContent.length() - 1);
-            addNewLine = true;
-        }
-        updatedContent += desiredKey + "=" + formattedDesiredValue + "\n";
-        // Add a newline character if the last part of updatedContent initially had "\n"
-        if (addNewLine) {
-            updatedContent += "\n";
-            addNewLine = false;
-        }
-    }
 
-    if (!sectionFound && !keyFound && desiredNewKey.empty()) {
-        updatedContent += "\n[" + desiredSection + "]\n" + desiredKey + "=" + formattedDesiredValue + "\n";
-    }
-
-    fclose(configFile);
-
-    // Reopen the original file for writing and overwrite its content
-    configFile = fopen(fileToEdit.c_str(), "w");
-    if (!configFile) {
-        // Handle the error accordingly
+    if (!configFile && !configFile.is_open()) {
+        // File does not exist, so we create a new one with the desired content
+        std::ofstream newFile(fileToEdit);
+        newFile << comment;
+        if (!comment.empty()) newFile << "\n";
+        newFile << "[" << desiredSection << "]\n" << desiredKey << " = " << desiredValue << "\n";
+        newFile.close();
         return;
     }
-    fprintf(configFile, "%s", updatedContent.c_str());
-    fclose(configFile);
-}
 
+    std::string line;
+    std::string currentSection;
+
+    while (getline(configFile, line)) {
+        std::string trimmedLine = trim(line);
+
+        if (trimmedLine.empty()) continue;
+
+        if (trimmedLine[0] == '[' && trimmedLine.back() == ']') {
+            currentSection = trimmedLine.substr(1, trimmedLine.size() - 2);
+            if (currentSection == desiredSection) {
+                sectionFound = true;
+                updatedContent << line << "\n";
+                continue;
+            }
+        }
+
+        if (sectionFound && !keyFound && trimmedLine.find('=') != std::string::npos) {
+            auto delimiterPos = trimmedLine.find('=');
+            std::string key = trim(trimmedLine.substr(0, delimiterPos));
+
+            if (key == desiredKey) {
+                keyFound = true;
+                if (desiredNewKey.empty()) {
+                    updatedContent << desiredKey << " = " << desiredValue << "\n";
+                } else {
+                    updatedContent << desiredNewKey << " = " << desiredValue << "\n";
+                }
+                continue;
+            }
+        }
+
+        updatedContent << line << "\n";
+    }
+
+    if (!sectionFound) {
+        updatedContent << "\n[" << desiredSection << "]\n";
+    }
+    if (!keyFound) {
+        updatedContent << desiredKey << " = " << desiredValue << "\n";
+    }
+
+    configFile.close();
+
+    // Rewrite the file
+    std::ofstream outFile(fileToEdit);
+    if (outFile.is_open()) {
+        outFile << updatedContent.str();
+        outFile.close();
+    } else {
+        // Handle file opening error
+    }
+}
 
 
 
@@ -707,57 +622,51 @@ void setIniFileKey(const std::string& fileToEdit, const std::string& desiredSect
  * @param filePath The path to the INI file.
  * @param sectionName The name of the section to add.
  */
-void addIniSection(const char* filePath, const char* sectionName) {
-    if (!isFileOrDirectory(filePath)) {
-        // INI file doesn't exist, handle the error accordingly
-        //std::cerr << "Error: INI file not found." << std::endl;
+void addIniSection(const std::string& filePath, const std::string& sectionName) {
+    std::ifstream inputFile(filePath);
+    if (!inputFile.is_open()) {
+        logMessage("Error: INI file not found or failed to open.");
         return;
     }
-    
-    // Read the existing contents of the INI file
-    FILE* inputFile = fopen(filePath, "r");
-    if (!inputFile) {
-        //std::cerr << "Error: Failed to open INI file for reading." << std::endl;
+
+    std::ofstream tempFile("temp.ini");
+    if (!tempFile.is_open()) {
+        logMessage("Error: Failed to create a temporary file.");
         return;
     }
-    
-    FILE* tempFile = fopen("temp.ini", "w");
-    if (!tempFile) {
-        //std::cerr << "Error: Failed to create a temporary file." << std::endl;
-        fclose(inputFile);
-        return;
-    }
-    
-    //constexpr size_t BufferSize = 4096;
-    char line[BufferSize];
+
+    std::string line;
     bool sectionExists = false;
-    while (fgets(line, sizeof(line), inputFile)) {
-        // Check if the line contains the section
-        if (line[0] == '[' && strncmp(&line[1], sectionName, strlen(sectionName)) == 0) {
+    std::string sectionHeader = "[" + sectionName + "]";
+
+    while (getline(inputFile, line)) {
+        // Check if the current line contains the section
+        if (line.find(sectionHeader) == 0) {
             sectionExists = true;
-            break;  // Section already exists, no need to continue
+            // Break since the section already exists; no need to add it again
+            break;
         }
-        fputs(line, tempFile);
+        tempFile << line << "\n";
     }
-    
+
+    // Only add the section if it does not exist
     if (!sectionExists) {
-        // Section doesn't exist, add it
-        fprintf(tempFile, "[%s]\n", sectionName);
+        tempFile << sectionHeader << "\n";
     }
-    
-    // Copy the rest of the input file to the temp file
-    while (fgets(line, sizeof(line), inputFile)) {
-        fputs(line, tempFile);
+
+    // Copy the rest of the input file to the temp file if not done
+    while (getline(inputFile, line)) {
+        tempFile << line << "\n";
     }
-    
-    fclose(inputFile);
-    fclose(tempFile);
-    
+
+    inputFile.close();
+    tempFile.close();
+
     // Replace the original file with the temp file
-    remove(filePath);  // Delete the old configuration file
-    rename("temp.ini", filePath);  // Rename the temp file to the original name
-    
-    //std::cout << "Section '" << sectionName << "' added to the INI file." << std::endl;
+    std::remove(filePath.c_str());  // Delete the old configuration file
+    std::rename("temp.ini", filePath.c_str());  // Rename the temp file to the original name
+
+    logMessage("Section '" + sectionName + "' added to the INI file.");
 }
 
 
@@ -776,66 +685,60 @@ void addIniSection(const char* filePath, const char* sectionName) {
  * @param newSectionName The new name for the section.
  */
 void renameIniSection(const std::string& filePath, const std::string& currentSectionName, const std::string& newSectionName) {
-    FILE* configFile = fopen(filePath.c_str(), "r");
-    if (!configFile) {
-        // The INI file doesn't exist, handle the error accordingly
+    std::ifstream configFile(filePath);
+    if (!configFile.is_open()) {
+        logMessage("Error: Failed to open INI file.");
         return;
     }
-    
+
     std::string tempPath = filePath + ".tmp";
-    FILE* tempFile = fopen(tempPath.c_str(), "w");
-    if (!tempFile) {
-        // Failed to create a temporary file, handle the error accordingly
-        fclose(configFile);
+    std::ofstream tempFile(tempPath);
+    if (!tempFile.is_open()) {
+        logMessage("Error: Failed to create a temporary file.");
+        configFile.close();
         return;
     }
-    
-    std::string currentSection;
-    bool renaming = false;
-    //constexpr size_t BufferSize = 4096;
-    char line[BufferSize];
-    
-    std::string currentLine, sectionName;
-    while (fgets(line, sizeof(line), configFile)) {
-        currentLine = trim(std::string(line));
-        
-        // Check if the line represents a section
-        if (currentLine.length() > 2 && currentLine.front() == '[' && currentLine.back() == ']') {
-            sectionName = currentLine.substr(1, currentLine.size() - 2);
+
+    std::string line;
+    bool sectionExists = false;
+    bool newNameExists = false;
+
+    while (getline(configFile, line)) {
+        std::string trimmedLine = trim(line);
+
+        if (trimmedLine.size() > 2 && trimmedLine.front() == '[' && trimmedLine.back() == ']') {
+            std::string sectionHeader = trimmedLine.substr(1, trimmedLine.size() - 2);
             
-            if (sectionName == currentSectionName) {
-                // We found the section to rename
-                fprintf(tempFile, "[%s]\n", newSectionName.c_str());
-                renaming = true;
-            } else {
-                // Copy the line as is
-                fprintf(tempFile, "%s", currentLine.c_str());
-                renaming = false;
+            if (sectionHeader == currentSectionName) {
+                tempFile << "[" << newSectionName << "]\n";
+                sectionExists = true;
+                continue;
+            } else if (sectionHeader == newSectionName) {
+                newNameExists = true;
+                break; // Exit if the new section name already exists
             }
-        } else if (renaming) {
-            // Rename the section in the following lines
-            fprintf(tempFile, "[%s]\n", newSectionName.c_str());
-            renaming = false;
-        } else {
-            // Copy the line as is
-            fprintf(tempFile, "%s", currentLine.c_str());
+        }
+
+        tempFile << line << "\n";
+    }
+
+    configFile.close();
+    tempFile.close();
+
+    if (sectionExists && !newNameExists) {
+        std::remove(filePath.c_str());
+        std::rename(tempPath.c_str(), filePath.c_str());
+    } else {
+        // If the section doesn't exist or the new section name already exists, delete the temp file
+        std::remove(tempPath.c_str());
+        if (!sectionExists) {
+            logMessage("Error: The section to rename does not exist.");
+        }
+        if (newNameExists) {
+            logMessage("Error: The new section name already exists.");
         }
     }
-    
-    fclose(configFile);
-    fclose(tempFile);
-    
-    // Replace the original file with the temp file
-    if (remove(filePath.c_str()) != 0) {
-        // Failed to delete the original file, handle the error accordingly
-        return;
-    }
-    
-    if (rename(tempPath.c_str(), filePath.c_str()) != 0) {
-        // Failed to rename the temp file, handle the error accordingly
-    }
 }
-
 
 
 
@@ -850,61 +753,48 @@ void renameIniSection(const std::string& filePath, const std::string& currentSec
  * @param sectionName The name of the section to remove.
  */
 void removeIniSection(const std::string& filePath, const std::string& sectionName) {
-    FILE* configFile = fopen(filePath.c_str(), "r");
-    if (!configFile) {
-        // The INI file doesn't exist, or there was an error opening it.
-        // Handle the error accordingly or return.
+    std::ifstream configFile(filePath);
+    if (!configFile.is_open()) {
+        logMessage("Error opening INI file");
         return;
     }
-    
+
     std::string tempPath = filePath + ".tmp";
-    FILE* tempFile = fopen(tempPath.c_str(), "w");
-    if (!tempFile) {
-        // Failed to create a temporary file, handle the error accordingly
-        fclose(configFile);
-        // Handle the error or return.
+    std::ofstream tempFile(tempPath);
+    if (!tempFile.is_open()) {
+        logMessage("Error creating temporary file");
+        configFile.close();
         return;
     }
-    
-    std::string currentSection;
+
+    std::string line;
     bool removing = false;
-    //constexpr size_t BufferSize = 4096;
-    char line[BufferSize];
-    
-    std::string currentLine, _section;
-    
-    while (fgets(line, sizeof(line), configFile)) {
-        currentLine = trim(std::string(line));
-        
-        // Check if the line represents a section
-        if (currentLine.length() > 2 && currentLine.front() == '[' && currentLine.back() == ']') {
-            _section = currentLine.substr(1, currentLine.size() - 2);
-            
-            if (_section == sectionName) {
-                // We found the section to remove, so skip it and associated key-value pairs
-                removing = true;
-            } else {
-                // Keep other sections
-                fprintf(tempFile, "%s\n", currentLine.c_str());
-                removing = false;
-            }
-        } else if (!removing) {
-            // Keep lines outside of the section
-            fprintf(tempFile, "%s\n", currentLine.c_str());
+    std::string sectionHeader = "[" + sectionName + "]";
+
+    while (getline(configFile, line)) {
+        std::string trimmedLine = trim(line);
+
+        if (trimmedLine.empty()) continue;
+
+        if (trimmedLine.front() == '[' && trimmedLine.back() == ']') {
+            removing = (trimmedLine == sectionHeader);
+        }
+
+        if (!removing) {
+            tempFile << line << '\n';
         }
     }
-    
-    fclose(configFile);
-    fclose(tempFile);
-    
-    // Replace the original file with the temp file
+
+    configFile.close();
+    tempFile.close();
+
     if (remove(filePath.c_str()) != 0) {
-        // Failed to delete the original file, handle the error accordingly
+        logMessage("Error deleting original file");
         return;
     }
-    
+
     if (rename(tempPath.c_str(), filePath.c_str()) != 0) {
-        // Failed to rename the temp file, handle the error accordingly
+        logMessage("Error renaming temporary file");
     }
 }
 
