@@ -19,7 +19,6 @@
 #pragma once
 #include <switch.h>
 #include <fstream>
-#include <dirent.h>
 #include <fnmatch.h>
 #include <path_funcs.hpp>
 #include <hex_funcs.hpp>
@@ -601,93 +600,68 @@ bool isDangerousCombination(const std::string& patternPath) {
  * @return A vector containing pairs of section names and their associated key-value pairs.
  */
 std::vector<std::pair<std::string, std::vector<std::vector<std::string>>>> loadOptionsFromIni(const std::string& configIniPath, bool makeConfig = false) {
-    std::vector<std::pair<std::string, std::vector<std::vector<std::string>>>> options;
-    
-    FILE* configFile = fopen(configIniPath.c_str(), "r");
-    if (!configFile ) {
-        // Write the default INI file
-        FILE* configFileOut = fopen(configIniPath.c_str(), "w");
-        std::string commands;
-        if (makeConfig) {
-            commands = "["+REBOOT+"]\n"
-                       "reboot\n"
-                       "["+SHUTDOWN+"]\n"
-                       "shutdown\n";
-        } else
-            commands = "";
-        fprintf(configFileOut, "%s", commands.c_str());
-        
-        
-        fclose(configFileOut);
-        configFile = fopen(configIniPath.c_str(), "r");
+    std::ifstream configFile(configIniPath);
+    if (!configFile && makeConfig) {
+        std::ofstream configFileOut(configIniPath);
+        if (configFileOut) {
+            configFileOut << "[REBOOT]\nreboot\n[SHUTDOWN]\nshutdown\n";
+            configFileOut.close();
+        }
+        configFile.open(configIniPath);  // Reopen the newly created file
     }
-    
-    constexpr size_t BufferSize = 4096; // Choose a larger buffer size for reading lines
-    char line[BufferSize];
-    std::string currentOption;
-    std::vector<std::vector<std::string>> commands;
-    
+
+    if (!configFile) {
+        return {}; // If file still cannot be opened, return empty vector
+    }
+
+    std::vector<std::pair<std::string, std::vector<std::vector<std::string>>>> options;
+    std::string line, currentSection;
+    std::vector<std::vector<std::string>> sectionCommands;
     bool isFirstEntry = true;
-    std::string trimmedLine;
-    std::string part, arg;
-    bool inQuotes;
-    
-    std::vector<std::string> commandParts;
-    std::istringstream iss, argIss; // Move this line outside the loop
-    
-    while (fgets(line, sizeof(line), configFile)) {
-        trimmedLine = line;
-        trimmedLine.erase(trimmedLine.find_last_not_of("\r\n") + 1);  // Remove trailing newline character
-        
-        if (trimmedLine.empty() || trimmedLine[0] == '#')
-            continue;// Skip empty lines and comment lines
-        else if (trimmedLine[0] == '[' && trimmedLine.back() == ']') {
-            if (isFirstEntry) { // for preventing header comments from being loaded within the first command section
-                commands.clear();
+
+    while (getline(configFile, line)) {
+        // Properly remove carriage returns and newlines
+        line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+        line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
+
+        if (line.empty() || line[0] == '#') continue; // Skip empty or comment lines
+
+        if (line.front() == '[' && line.back() == ']') { // Section headers
+            if (isFirstEntry) { // Clear commands for the first entry to prevent loading header comments
+                sectionCommands.clear();
                 isFirstEntry = false;
             }
-            
-            // New option section
-            if (!currentOption.empty()) {
-                // Store previous option and its commands
-                options.emplace_back(std::move(currentOption), std::move(commands));
-                commands.clear();
+            if (!currentSection.empty()) {
+                options.emplace_back(std::move(currentSection), std::move(sectionCommands));
+                sectionCommands.clear();
             }
-            currentOption = trimmedLine.substr(1, trimmedLine.size() - 2);  // Extract option name
-        } else {
-            // Command line
-            //std::istringstream iss(trimmedLine);
-            iss.clear(); // Reset stream state
-            iss.str(trimmedLine); // Set new content
-            
-            commandParts.clear();
-            
-            part = "";
-            inQuotes = false;
-            while (std::getline(iss, part, '\'')) {
-                if (!part.empty()) {
-                    if (!inQuotes) {
-                        // Outside quotes, split on spaces
-                        argIss.clear();
-                        argIss.str(part);
-                        //std::istringstream argIss(part);
-                        arg = "";
-                        while (argIss >> arg)
-                            commandParts.push_back(arg);
-                    } else
-                        commandParts.push_back(part); // Inside quotes, treat as a whole argument
+            currentSection = line.substr(1, line.size() - 2);
+        } else { // Command lines within sections
+            std::istringstream iss(line);
+            std::vector<std::string> commandParts;
+            std::string part;
+            bool inQuotes = false;
+
+            while (std::getline(iss, part, '\'')) { // Split on single quotes
+                if (inQuotes) {
+                    commandParts.push_back(part); // Inside quotes, treat as a whole argument
+                } else {
+                    std::istringstream argIss(part);
+                    std::string arg;
+                    while (argIss >> arg) {
+                        commandParts.push_back(arg); // Split part outside quotes by spaces
+                    }
                 }
-                inQuotes = !inQuotes;
+                inQuotes = !inQuotes; // Toggle the inQuotes flag
             }
-            commands.push_back(std::move(commandParts));
+            sectionCommands.push_back(std::move(commandParts));
         }
     }
-    
-    // Store the last option and its commands
-    if (!currentOption.empty())
-        options.emplace_back(std::move(currentOption), std::move(commands));
-    
-    fclose(configFile);
+
+    if (!currentSection.empty()) {
+        options.emplace_back(std::move(currentSection), std::move(sectionCommands));
+    }
+
     return options;
 }
 
@@ -695,20 +669,19 @@ std::vector<std::pair<std::string, std::vector<std::vector<std::string>>>> loadO
 
 // Function to populate selectedItemsListOff from a JSON array based on a key
 void populateSelectedItemsList(const std::string& sourceType, const std::string& jsonStringOrPath, const std::string& jsonKey, std::vector<std::string>& selectedItemsList) {
-    json_t* jsonData = nullptr;
-    
+    std::unique_ptr<json_t, JsonDeleter> jsonData;
+
     if (sourceType == "json")
-        jsonData = stringToJson(jsonStringOrPath);
+        jsonData.reset(stringToJson(jsonStringOrPath));
     else if (sourceType == "json_file")
-        jsonData = readJsonFromFile(jsonStringOrPath);
-    
-    if (jsonData && json_is_array(jsonData)) {
-        
-        size_t arraySize = json_array_size(jsonData);
+        jsonData.reset(readJsonFromFile(jsonStringOrPath));
+
+    if (jsonData && json_is_array(jsonData.get())) {
+        size_t arraySize = json_array_size(jsonData.get());
         selectedItemsList.reserve(arraySize); // Preallocate memory for efficiency
         
         for (size_t i = 0; i < arraySize; ++i) {
-            json_t* item = json_array_get(jsonData, i);
+            json_t* item = json_array_get(jsonData.get(), i);
             if (item && json_is_object(item)) {
                 json_t* keyValue = json_object_get(item, jsonKey.c_str());
                 if (keyValue && json_is_string(keyValue)) {
@@ -719,12 +692,6 @@ void populateSelectedItemsList(const std::string& sourceType, const std::string&
                 }
             }
         }
-    }
-    
-    // Free jsonDataOn
-    if (jsonData != nullptr) {
-        json_decref(jsonData);
-        jsonData = nullptr;
     }
 }
 
@@ -1232,7 +1199,7 @@ void processCommand(const std::vector<std::string>& cmd, const std::string& pack
         if (cmdSize >= 2) {
             std::string sourcePath = preprocessPath(cmd[1]);
             std::string desiredSection = removeQuotes(cmd[2]);
-            std::string removeIniSection(sourcePath.c_str(), desiredSection.c_str());
+            removeIniSection(sourcePath.c_str(), desiredSection.c_str());
         }
     } else if (commandName == "set-ini-val" || commandName == "set-ini-value") {
         if (cmdSize >= 5) {
@@ -1584,11 +1551,12 @@ void backgroundInterpreter(void*) {
             logMessage("End of interpreter");
             //break;
         }
+        //logMessage("looping...");
     }
 }
 
 void closeInterpreterThread() {
-   logMessage("Closing interpreter...");
+   //logMessage("Closing interpreter...");
    {
        std::lock_guard<std::mutex> lock(queueMutex);
        interpreterThreadExit.store(true, std::memory_order_release);
@@ -1598,7 +1566,7 @@ void closeInterpreterThread() {
    threadClose(&interpreterThread);
    // Reset flags
    clearInterpreterFlags();
-   logMessage("Interpreter has been closed.");
+   //logMessage("Interpreter has been closed.");
 }
 
 
@@ -1635,102 +1603,3 @@ void enqueueInterpreterCommand(std::vector<std::vector<std::string>>&& commands,
     queueCondition.notify_one();
 }
 
-
-
-
-// Thread information structure
-//Thread commandThread;
-//std::queue<std::tuple<std::vector<std::string>, std::string, std::string>> commandQueue;
-//std::mutex commandQueueMutex;
-//std::condition_variable commandQueueCondition;
-//static bool commandThreadExit = false;
-//
-//
-//
-//void backgroundCommand(void*) {
-//    try {
-//        while (!commandThreadExit) {
-//            std::tuple<std::vector<std::string>, std::string, std::string> args;
-//
-//            {
-//                std::unique_lock<std::mutex> lock(commandQueueMutex);
-//                commandQueueCondition.wait(lock, [] { return !commandQueue.empty() || commandThreadExit; });
-//
-//                if (!commandQueue.empty()) {
-//                    args = std::move(commandQueue.front());
-//                    commandQueue.pop();
-//                }
-//            } // Release the lock before processing the command
-//
-//            if (!std::get<0>(args).empty()) {
-//                processCommand(std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::move(std::get<2>(args)));
-//            }
-//        }
-//    } catch (...) {
-//        // Exception occurred, clear the queue and reset flags
-//        std::lock_guard<std::mutex> lock(commandQueueMutex);
-//        while (!commandQueue.empty()) {
-//            commandQueue.pop();
-//        }
-//        logMessage("Command failure.");
-//        // Optionally, log the exception or perform additional cleanup
-//    }
-//}
-//
-//
-//void startCommandThread() {
-//    commandThreadExit = false;
-//    int result = threadCreate(&commandThread, backgroundCommand, nullptr, nullptr, 0x4000, 0x10, -2);
-//    if (result != 0) {
-//        // Failed to create thread, clear the queue and reset flags
-//        std::lock_guard<std::mutex> lock(commandQueueMutex);
-//        while (!commandQueue.empty()) {
-//            commandQueue.pop();
-//        }
-//        logMessage("Failed to create command thread.");
-//        return;
-//    }
-//    threadStart(&commandThread);
-//}
-//
-//
-//
-//void closeCommandThread() {
-//    logMessage("Closing command...");
-//    {
-//        std::lock_guard<std::mutex> lock(commandQueueMutex);
-//        commandThreadExit = true;
-//        commandQueueCondition.notify_one();
-//    }
-//    threadWaitForExit(&commandThread);
-//    threadClose(&commandThread);
-//    logMessage("Command has been closed.");
-//}
-//
-//void enqueueCommand(std::vector<std::string>&& command, const std::string& packagePath, const std::string& selectedCommand) {
-//    startCommandThread(); // Start the command thread if it's not already running
-//
-//    // Enqueue the command
-//    {
-//        std::lock_guard<std::mutex> lock(commandQueueMutex);
-//        commandQueue.emplace(std::move(command), packagePath, selectedCommand);
-//    }
-//    commandQueueCondition.notify_one(); // Notify the command thread that a new command is available
-//
-//    // Wait for the command thread to complete execution
-//    while (true) {
-//        {
-//            std::lock_guard<std::mutex> lock(commandQueueMutex);
-//            if (commandQueue.empty()) {
-//                break; // If the queue is empty, the command thread has completed
-//            }
-//        }
-//        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Wait for 100 milliseconds before checking again
-//    }
-//
-//    // Close the command thread
-//    closeCommandThread();
-//}
-//
-//
-//
