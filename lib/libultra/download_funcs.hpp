@@ -63,7 +63,7 @@ extern "C" int progressCallback(void *ptr, curl_off_t totalToDownload, curl_off_
     auto percentage = static_cast<std::atomic<int>*>(ptr);
 
     if (totalToDownload > 0) {
-        int newProgress = static_cast<int>(double(nowDownloaded) / double(totalToDownload) *100);
+        int newProgress = static_cast<int>(float(nowDownloaded) / float(totalToDownload) *100);
         percentage->store(newProgress, std::memory_order_release);
     }
 
@@ -127,6 +127,7 @@ bool downloadFile(const std::string& url, const std::string& toDestination) {
     curl_easy_setopt(curl.get(), CURLOPT_XFERINFOFUNCTION, progressCallback);
     curl_easy_setopt(curl.get(), CURLOPT_XFERINFODATA, &downloadPercentage);
     curl_easy_setopt(curl.get(), CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+    curl_easy_setopt(curl.get(), CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2); // Force TLS 1.2, if necessary
     curl_easy_setopt(curl.get(), CURLOPT_FOLLOWLOCATION, 1L);
     //curl_easy_setopt(curl.get(), CURLOPT_MAXREDIRS, 5); // Limit the number of redirects
 
@@ -187,6 +188,12 @@ bool unzipFile(const std::string& zipFilePath, const std::string& toDestination)
     }
 
     bool success = true;
+    const zzip_ssize_t bufferSize = 4096;
+
+    std::string fileName, extractedFilePath;
+    size_t firstColonPos, colonPos, pos;
+    std::string directoryPath;
+
     ZZIP_DIRENT entry;
     while (zzip_dir_read(dir.get(), &entry)) {
         if (abortUnzip.load(std::memory_order_acquire)) {
@@ -197,19 +204,19 @@ bool unzipFile(const std::string& zipFilePath, const std::string& toDestination)
 
         if (entry.d_name[0] == '\0') continue; // Skip empty entries
 
-        std::string fileName = entry.d_name;
-        std::string extractedFilePath = toDestination + fileName;
+        fileName = entry.d_name;
+        extractedFilePath = toDestination + fileName;
         if (extractedFilePath.size() >= 3 && extractedFilePath.substr(extractedFilePath.size() - 3) == "...") continue; // Skip problematic entries
 
         // Clean up path characters and skip directories
-        size_t firstColonPos = extractedFilePath.find(':');
+        firstColonPos = extractedFilePath.find(':');
         while (firstColonPos != std::string::npos && firstColonPos < extractedFilePath.size()) {
-            size_t colonPos = extractedFilePath.find(':', firstColonPos + 1);
+            colonPos = extractedFilePath.find(':', firstColonPos + 1);
             if (colonPos != std::string::npos) extractedFilePath[colonPos] = ' ';
             firstColonPos = colonPos;
         }
 
-        size_t pos = extractedFilePath.find("  ");
+        pos = extractedFilePath.find("  ");
         while (pos != std::string::npos) {
             extractedFilePath.replace(pos, 2, " ");
             pos = extractedFilePath.find("  ", pos + 1);
@@ -217,7 +224,7 @@ bool unzipFile(const std::string& zipFilePath, const std::string& toDestination)
 
         if (!extractedFilePath.empty() && extractedFilePath.back() == '/') continue; // Skip directories
 
-        std::string directoryPath = (extractedFilePath.back() != '/') ? 
+        directoryPath = (extractedFilePath.back() != '/') ? 
             extractedFilePath.substr(0, extractedFilePath.find_last_of('/') + 1) : extractedFilePath;
         
         createDirectory(directoryPath);
@@ -226,7 +233,7 @@ bool unzipFile(const std::string& zipFilePath, const std::string& toDestination)
         if (file) {
             std::ofstream outputFile(extractedFilePath, std::ios::binary);
             if (outputFile.is_open()) {
-                const zzip_ssize_t bufferSize = 4096;
+                
                 char buffer[bufferSize];
                 zzip_ssize_t bytesRead;
 

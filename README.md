@@ -85,6 +85,6 @@ Beiträge sind willkommen! Wenn du Ideen, Vorschläge oder Fehlermeldungen hast,
 
 ## Lizenz
 
-Dieses Projekt ist lizenziert und wird unter [GPLv2](LICENSE) mit benutzerdefiniertem Code, der [CC-BY-4.0](SUB_LICENSE) verwendet, verteilt.
+This project is licensed and distributed under [GPLv2](LICENSE) with a custom library utilizing [CC-BY-4.0](SUB_LICENSE).
 
 Copyright (c) 2024 ppkantorski

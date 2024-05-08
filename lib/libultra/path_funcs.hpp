@@ -20,10 +20,16 @@
 #pragma once
 #include <fstream>
 #include <dirent.h>
+#include <sys/stat.h>
+#include "string_funcs.hpp"
+#include "get_funcs.hpp"
 
 static std::atomic<bool> abortFileOp(false);
 
 const size_t copyBufferSize = 4096*3; // Increase buffer size to 128 KB
+
+
+
 
 /**
  * @brief Creates a single directory if it doesn't exist.
@@ -33,10 +39,11 @@ const size_t copyBufferSize = 4096*3; // Increase buffer size to 128 KB
  * @param directoryPath The path of the directory to be created.
  */
 void createSingleDirectory(const std::string& directoryPath) {
-    struct stat st;
-    if (stat(directoryPath.c_str(), &st) != 0)
-        mkdir(directoryPath.c_str(), 0777);
+    if (!isDirectory(directoryPath)) {
+        mkdir(directoryPath.c_str(), 0777); // Use mode 0777 to allow wide access
+    }
 }
+
 
 /**
  * @brief Creates a directory and its parent directories if they don't exist.
@@ -116,21 +123,23 @@ void deleteFileOrDirectory(const std::string& pathToDelete) {
                 logMessage("Failed to delete file: " + pathToDelete);
             }
         } else if (S_ISDIR(pathStat.st_mode)) {
-            DIR* directory = opendir(pathToDelete.c_str());
-            if (directory != nullptr) {
+            std::unique_ptr<DIR, DirCloser> directory(opendir(pathToDelete.c_str()));
+            if (directory) {
                 dirent* entry;
-                while ((entry = readdir(directory)) != nullptr) {
+                while ((entry = readdir(directory.get())) != nullptr) {
                     const std::string& fileName = entry->d_name;
                     if (fileName != "." && fileName != "..") {
                         std::string filePath = pathToDelete + "/" + fileName;
                         deleteFileOrDirectory(filePath);
                     }
                 }
-                closedir(directory);
             } else {
                 logMessage("Failed to open directory: " + pathToDelete);
             }
-            
+
+            // Close the directory before deleting
+            directory.reset();
+
             if (rmdir(pathToDelete.c_str()) == 0) {
                 //logMessage("Directory deleted: " + pathToDelete);
             } else {
@@ -143,6 +152,7 @@ void deleteFileOrDirectory(const std::string& pathToDelete) {
         //logMessage("Error accessing path: " + pathToDelete);
     }
 }
+
 
 
 /**
@@ -191,10 +201,9 @@ void moveFileOrDirectory(const std::string& sourcePath, const std::string& desti
         
         if (S_ISDIR(sourceInfo.st_mode)) {
             // Source path is a directory
-            DIR* dir = opendir(sourcePath.c_str());
+            std::unique_ptr<DIR, DirCloser> dir(opendir(sourcePath.c_str()));
             if (!dir) {
-                //logMessage("Failed to open source directory: "+sourcePath);
-                //printf("Failed to open source directory: %s\n", sourcePath.c_str());
+                logMessage("Failed to open source directory: " + sourcePath);
                 return;
             }
             
@@ -202,7 +211,7 @@ void moveFileOrDirectory(const std::string& sourcePath, const std::string& desti
             
             std::string sourceFilePath, destinationFilePath;
             
-            while ((entry = readdir(dir)) != NULL) {
+            while ((entry = readdir(dir.get())) != NULL) {
                 const std::string& fileOrFolderName = entry->d_name;
                 
                 if (fileOrFolderName != "." && fileOrFolderName != "..") {
@@ -219,7 +228,7 @@ void moveFileOrDirectory(const std::string& sourcePath, const std::string& desti
                 }
             }
             
-            closedir(dir);
+            dir.reset();  // Explicitly close the directory
             
             // Delete the source directory
             deleteFileOrDirectory(sourcePath);
@@ -253,6 +262,7 @@ void moveFileOrDirectory(const std::string& sourcePath, const std::string& desti
     // Move unsuccessful or source file/directory doesn't exist
     return;
 }
+
 
 /**
  * @brief Moves files or directories matching a specified pattern to a destination directory.
@@ -356,15 +366,11 @@ void copyFileOrDirectory(const std::string& fromPath, const std::string& toPath)
             toFilePath += getNameFromPath(fromPath);
         }
 
-        struct stat toStat;
-        if (stat(toFilePath.c_str(), &toStat) == 0 && S_ISREG(toStat.st_mode)) {
-            std::remove(toFilePath.c_str());  // Remove the file if it already exists
-        }
-
-        createDirectory(toPath.substr(0, toPath.find_last_of('/')));
+        // Ensure the destination directory exists
+        createDirectory(getParentDirFromPath(toFilePath));
         copySingleFile(fromPath, toFilePath);
     } else if (S_ISDIR(fromStat.st_mode)) {
-        DIR* dir = opendir(fromPath.c_str());
+        std::unique_ptr<DIR, DirCloser> dir(opendir(fromPath.c_str()));
         if (!dir) {
             logMessage("Failed to open directory: " + fromPath);
             return;
@@ -378,18 +384,16 @@ void copyFileOrDirectory(const std::string& fromPath, const std::string& toPath)
 
         createDirectory(toDirPath);
 
-        struct dirent* entry;
-        while ((entry = readdir(dir)) != nullptr) {
+        dirent* entry;
+        std::string newFromPath;
+
+        while ((entry = readdir(dir.get())) != nullptr) {
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
                 continue;
             }
 
-            std::string newFromPath = fromPath + '/' + entry->d_name;
+            newFromPath = fromPath + '/' + entry->d_name;
             copyFileOrDirectory(newFromPath, toDirPath);
-        }
-
-        if (closedir(dir) != 0) {
-            logMessage("Failed to close directory: " + fromPath);
         }
     }
 }
