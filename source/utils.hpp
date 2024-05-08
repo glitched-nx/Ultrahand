@@ -67,7 +67,7 @@ static const std::string overlayDirectory = "sdmc:/switch/.overlays/";
 static const std::string teslaSettingsConfigIniPath = "sdmc:/config/tesla/"+configFileName;
 static const std::string overlaysIniFilePath = settingsPath + "overlays.ini";
 static const std::string packagesIniFilePath = settingsPath + "packages.ini";
-static const std::string ultrahandRepo = "https://github.com/ppkantorski/Ultrahand-Overlay/";
+static const std::string ultrahandRepo = "https://github.com/glitched-nx/Ultrahand-Overlay/";
 
 static bool isDownloadCommand = false;
 static bool commandSuccess = false;
