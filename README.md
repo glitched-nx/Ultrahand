@@ -2,11 +2,19 @@
 
 Das Ultrahand Overlay ist ein Ersatz für das [Tesla Menu](https://github.com/WerWolv/Tesla-Menu), das von Grund auf auf [libtesla](https://github.com/WerWolv/libtesla) aufgebaut ist und leistungsstarke C/C++-Befehle über die Verwendung einer eigenen interpretativen Programmiersprache (ähnlich wie Shell/BASH) bietet. Es ist ein vielseitiges Tool, das es dir ermöglicht, benutzerdefinierte Befehls basierte Pakete zu erstellen und zu teilen, um die Verwaltung von Einstellungen, Dateien und Verzeichnissen auf deiner Nintendo Switch zu verbessern.
 
+
+[![Ultrahand Logo](.pics/banner.gif)](https://gbatemp.net/threads/ultrahand-overlay-the-fully-craft-able-overlay-executor.633560/)
+
 Mit Ultrahand hast du die Flexibilität, dein Dateimanagementsystem nach deinen Bedürfnissen anzupassen und zu formen, und erhältst damit eine größere Kontrolle über deine Systemkonfigurationen.
+
 
 ## Funktionen
 
 Das Ultrahand Overlay bietet derzeit folgende Funktionen:
+
+
+## Screenshots
+![Slideshow](https://gbatemp.net/attachments/ezgif-4-024e7852d3-gif.400949/)
 
 - Verzeichnisse erstellen:
   - Erstelle mühelos Verzeichnisse auf deiner SD-Karte, indem du den Verzeichnispfad angibst. Ultrahand übernimmt den Erstellungsprozess für dich.
@@ -66,13 +74,21 @@ Bitte beachte, dass das Ausführen von Homebrew-Software auf deiner Nintendo Swi
 
 Um die Software zu kompilieren und auszuführen, müssen die folgenden C/C++-Abhängigkeiten installiert sein:
 
+### Compilation Prerequisites
+
+To compile and run the software, you need to have the following C/C++ dependencies installed:
+
+- [libultra](lib/libultra)
+- [custom libtesla](lib/libtesla)
+
 - [benutzerdefinierter libtesla Fork](https://github.com/glitched-nx/Ultrahand-Overlay/tree/main/lib/libtesla)
+
 - switch-curl
 - switch-zziplib
 - switch-mbedtls
 - switch-jansson
 
-
+Please note that running homebrew software on your Nintendo Switch may void your warranty and can carry certain risks. Ensure that you understand the implications and follow the appropriate guidelines and precautions when using homebrew software.
 
 ## Hinweise zum Fork
 

@@ -1,5 +1,8 @@
 # libultra
 
+![Ultrahand Logo](https://github.com/ppkantorski/Ultrahand-Overlay/blob/main/.pics/ultrahand.png)
+
+
 ## Overview
 
 `libultra` is a powerful collection of helper functions designed specifically for the Ultrahand Overlay project. This library offers a comprehensive set of utilities aimed at simplifying common tasks and enhancing the efficiency of your projects within the Ultrahand Overlay ecosystem.
@@ -40,7 +43,7 @@
 
 ### Mod Functions
 
-- **mod_funcs.hpp**: Modular arithmetic functions, facilitating computations involving modular arithmetic operations.
+- **mod_funcs.hpp**: Functions for manipulating game mods, facilitating operations and management tasks related to modifications in gaming environments.
 
 ### Path Functions
 
