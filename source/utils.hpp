@@ -63,7 +63,6 @@ bool usingErista = util::IsErista();
 bool usingMariko = util::IsMariko();
 
 
-
 void initializeTheme(std::string themeIniPath = themeConfigIniPath) {
     tsl::hlp::ini::IniData themesData;
     bool initialize = false;
