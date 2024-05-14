@@ -2876,7 +2876,7 @@ namespace tsl {
                     PCB_temperatureStringSTD = "";
                     SOC_temperatureStringSTD = "";
                     
-                    firstHalf = "Ultra";
+                    firstHalf = "Blue";
                     secondHalf = "hand";
                     
                     x = 20;

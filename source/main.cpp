@@ -620,10 +620,10 @@ public:
             
             //list->addItem(new tsl::elm::CategoryHeader(OVERLAY_INFO));
             PackageHeader overlayHeader;
-            overlayHeader.title = "Ultrahand Overlay";
+            overlayHeader.title = "Bluehand Overlay";
             overlayHeader.version = std::string(APP_VERSION);
             overlayHeader.creator = "ppkantorski";
-            overlayHeader.about = "Ultrahand Overlay is a versatile tool that enables you to create and share custom command-based packages.";
+            overlayHeader.about = "Bluehand (Ultrahand) Overlay is a versatile tool that enables you to create and share custom command-based packages.";
             overlayHeader.credits = "Special thanks to B3711, ComplexNarrative, Faker_dev, MasaGratoR, meha, WerWolv, HookedBehemoth and many others. <3";
             addAppInfo(list, overlayHeader, overlayStr);
             overlayHeader.clear(); // free memory
@@ -3076,7 +3076,7 @@ private:
     bool useOverlayLaunchArgs = false;
     std::string hiddenMenuMode, dropdownSection;
     bool initializingSpawn = false;
-    std::string defaultLang = "en";
+    std::string defaultLang = "de";
     
 public:
     /**
