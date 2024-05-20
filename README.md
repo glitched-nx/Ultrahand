@@ -61,7 +61,15 @@ Um Ultrahand zu verwenden, befolge diese Schritte:
 - Du kannst auf einer Überlagerung/einem Paket oben auf `X` klicken, um sie zu favorisieren.
 - Du kannst auf einer Überlagerung/einem Paket oben auf `Y` klicken, um zusätzliche Einstellungen zu konfigurieren.
 
+
+1. Download and install the latest [nxovloader](https://github.com/WerWolv/nx-ovlloader).
+2. Download the latest Ultrahand [ovlmenu.ovl](https://github.com/ppkantorski/Ultrahand-Overlay/releases/latest/download/ovlmenu.ovl) and place it within `/switch/.overlays/`.
+    - WARNING: This will overwrite `Tesla Menu` if already installed.
+3. After installing Ultrahand Overlay, a new folder named `ultrahand` will be created within the root config folder on your SD card (`/config/ultrahand/`) along with a `config.ini` file containing various Ultrahand settings.
+4. Launch Ultrahand (similarly to `Tesla Menu`) with Tesla's default hotkeys or Ultrahand's (`ZL+ZR+DDOWN`).  A new folder will be made (`/switch/.packages/`) with a preset `package.ini` file for your base menu commands.
+
 Für zusätzliche Unterstützung bei benutzerdefinierten Paketen kannst du das [Ultrahand Overlay Wiki](https://github.com/glitched-nx/Ultrahand-Overlay/wiki) besuchen.
+
 
 ### Nintendo Switch Kompatibilität
 Um das Ultrahand Overlay auf der Nintendo Switch auszuführen, musst du die erforderliche [Homebrew-Umgebung](https://github.com/Atmosphere-NX/Atmosphere) auf deiner Konsole mit HOS 16.0
