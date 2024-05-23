@@ -1,94 +1,98 @@
-# Ultrahand Overlay (HOS 16.0.0+)
-[![platform](https://img.shields.io/badge/platform-Switch-898c8c?logo=C++.svg)](https://gbatemp.net/forums/nintendo-switch.283/)
-[![language](https://img.shields.io/badge/language-C++-ba1632?logo=C++.svg)](https://github.com/topics/cpp)
-[![GPLv2 License](https://img.shields.io/badge/license-GPLv2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Downloads](https://img.shields.io/github/downloads/ppkantorski/Ultrahand-Overlay/total?color=189c11)](https://github.com/ppkantorski/Ultrahand-Overlay/releases)
+# BlueHAND Overlay
 
-Create directories, manage files, and customize configurations effortlessly using simple ini files.
+Das BlueHAND Overlay ist ein Ersatz für das [Tesla Menu](https://github.com/WerWolv/Tesla-Menu), das von Grund auf auf [libtesla](https://github.com/WerWolv/libtesla) aufgebaut ist und leistungsstarke C/C++-Befehle über die Verwendung einer eigenen interpretativen Programmiersprache (ähnlich wie Shell/BASH) bietet. Es ist ein vielseitiges Tool, das es dir ermöglicht, benutzerdefinierte Befehls basierte Pakete zu erstellen und zu teilen, um die Verwaltung von Einstellungen, Dateien und Verzeichnissen auf deiner Nintendo Switch zu verbessern.
 
 [![Ultrahand Logo](.pics/banner.gif)](https://gbatemp.net/threads/ultrahand-overlay-the-fully-craft-able-overlay-executor.633560/)
 
-Ultrahand Overlay is a [Tesla Menu](https://github.com/WerWolv/Tesla-Menu) replacement built from the ground up off of [libtesla](https://github.com/WerWolv/libtesla) that provides powerful C/C++ commands through the usage of its own custom interpretive programming language (similar to Shell/BASH).  It is a versatile tool that enables you to create and share custom command-based packages, providing enhanced functionality for managing settings, files and directories on your Nintendo Switch.
+Mit BlueHAND hast du die Flexibilität, dein Dateimanagementsystem nach deinen Bedürfnissen anzupassen und zu formen, und erhältst damit eine größere Kontrolle über deine Systemkonfigurationen.
 
-With Ultrahand, you have the flexibility to customize and shape your file management system according to your needs, empowering you with greater control over your system configurations.
+## Funktionen
+
+Das BlueHAND Overlay bietet derzeit folgende Funktionen:
 
 ## Screenshots
+
 ![Slideshow](https://gbatemp.net/attachments/ezgif-4-024e7852d3-gif.400949/)
 
-## Features
+- Verzeichnisse erstellen:
+  - Erstelle mühelos Verzeichnisse auf deiner SD-Karte, indem du den Verzeichnispfad angibst. BlueHAND übernimmt den Erstellungsprozess für dich.
 
-Ultrahand Overlay currently offers the following features:
+- Dateien oder Verzeichnisse kopieren:
+  - Kopiere Dateien oder Verzeichnisse von einem Ort zum anderen auf deiner SD-Karte. Gib einfach den Quell- und Ziel-Pfad an, und BlueHAND übernimmt nahtlos den Kopiervorgang.
 
-- Create Directories:
-  - Effortlessly create directories on your SD card by specifying the directory path. Ultrahand will handle the creation process for you.
+- Dateien oder Verzeichnisse löschen:
+  - Vereinfache das Löschen von Dateien und Verzeichnissen auf deiner SD-Karte. Indem du den Pfad der zu löschenden Datei oder des Verzeichnisses angibst, entfernt BlueHAND sie prompt, was den Löschprozess problemlos macht.
 
-- Copy Files or Directories:
-  - Easily copy files or directories from one location to another on your SD card. Just provide the source and destination paths, and Ultrahand will seamlessly handle the copying process.
+- Dateien oder Verzeichnisse verschieben:
+  - Verschiebe Dateien oder Verzeichnisse mühelos zwischen Orten auf deiner SD-Karte. Gib den Quellpfad und den Zielpfad des Verzeichnisses an, und BlueHAND kümmert sich um den Verschiebungsprozess und gewährleistet eine reibungslose Umplatzierung.
 
-- Delete Files or Directories:
-  - Simplify file and directory deletion on your SD card. By specifying the path of the file or directory you want to delete, Ultrahand promptly removes it, making the deletion process hassle-free.
+- Dateien herunterladen:
+  - Lade Dateien einfach auf deine SD-Karte herunter. Hol dir Dateien effizient aus Repositories oder URLs an deinen gewünschten Ort. Ob du Homebrew herunterladen/aktualisieren oder Dateien zwischen Orten übertragen möchtest, diese Funktion vereinfacht den Prozess und macht das Repository-Management zum Kinderspiel.
 
-- Move Files or Directories:
-  - Seamlessly move files or directories between locations on your SD card. Provide the source path and the destination directory path, and Ultrahand takes care of the moving process, ensuring smooth relocation.
+- Zip-Dateien entpacken:
+  - Entpacke komprimierte Zip-Dateien auf deiner SD-Karte, indem du archivierte Dateien entpackst und ihre ursprüngliche Struktur beibehältst. Ob du Zip-Archive heruntergeladen oder komprimierte Dateien erhalten hast, dieser Befehl vereinfacht den Prozess des Entpackens und macht es mühelos, auf die Inhalte zuzugreifen.
 
-- Download Files:
-  - Download files to your SD card with ease. Efficiently retrieve files from repositories or URLs to your desired location. Whether you need to download/update homebrew or transfer files between locations, this feature simplifies the process, making repository management a breeze.
+- INI-Dateien bearbeiten:
+  - Bearbeite INI-Dateien auf deiner SD-Karte mit Leichtigkeit. Übernehme die volle Kontrolle über deine Konfigurationen, indem du vorhandene Schlüssel-Wert-Paare aktualisierst, neue Einträge hinzufügst oder neue Abschnitte innerhalb der INI-Datei mit BlueHAND erstellst.
 
-- Unzip Files:
-  - Extract compressed zip files on your SD card by unzipping archived files, preserving their original structure. Whether you have downloaded zip archives or received compressed files, this command simplifies the process of extracting them, making it effortless to access the contents within.
+- Hex-Dateien bearbeiten:
+  - Führe hexadezimale Bearbeitungen von Dateien auf deiner SD-Karte durch. Bearbeite die Binärdaten direkt und ermögliche so eine präzise Kontrolle über deine Daten. Die Hex-Dateien-Bearbeitungsfunktion von BlueHAND ermöglicht es dir, Dateien in ihrer Rohform zu analysieren, zu bearbeiten und anzupassen.
 
-- Modify INI Files:
-  - Edit INI files on your SD card with ease. Take full control over your configurations by updating existing key-value pairs, adding new entries, or creating new sections within the INI file using Ultrahand.
+## Erste Schritte
 
-- Hex Edit Files:
-  - Perform hexadecimal editing of files on your SD card. Edit the binary data directly, allowing for precise control over your data. Ultrahand's Hex Edit Files feature enables you to analyze, modify, and customize files in their raw form.
+### Verwendung
 
+Um BlueHAND zu verwenden, befolge diese Schritte:
 
-## Getting Started
+1. Lade die neueste [nxovloader](https://github.com/WerWolv/nx-ovlloader) herunter und installiere sie.
+2. Lade das neueste BlueHAND (Fork) [ovlmenu.ovl](https://github.com/glitched-nx/BlueHAND-Overlay/releases/latest/download/ovlmenu.ovl) herunter und platziere es unter `/switch/.overlays/`.
+    - WARNUNG: Dies überschreibt `Tesla Menu`, wenn es bereits installiert ist.
+3. Nach der Installation des BlueHAND Overlays wird ein neuer Ordner namens `ultrahand` im config Verzeichnis auf deiner SD-Karte (`/config/ultrahand/`) zusammen mit einer `config.ini`-Datei erstellt, die verschiedene BlueHAND-Einstellungen enthält.
+4. Starte BlueHAND (ähnlich wie `Tesla Menu`) mit deiner festgelegten Tesla Tasten-Kombi oder BlueHAND's (`L+R+PLUS`). Es wird ein neuer Ordner (`/switch/.packages/`) mit einer vordefinierten `package.ini`-Datei für deine Grundmenübefehle erstellt.
 
-### Usage
+5. Platziere deine benutzerdefinierte `package.ini`-Paketdatei in deinem BlueHAND-Paketverzeichnis (`/switch/.packages/<PACKAGE_NAME>/`). Diese Datei enthält die Befehle für dein benutzerdefiniertes BlueHAND-Paket.
+6. Deine Befehle werden nun im Paketmenü innerhalb von BlueHAND angezeigt.
 
-To use Ultrahand, follow these steps:
+## Zusätzliche Funktionen
 
-1. Download and install the latest [nxovloader](https://github.com/WerWolv/nx-ovlloader).
-2. Download the latest Ultrahand [ovlmenu.ovl](https://github.com/ppkantorski/Ultrahand-Overlay/releases/latest/download/ovlmenu.ovl) and place it within `/switch/.overlays/`.
-    - WARNING: This will overwrite `Tesla Menu` if already installed.
-3. After installing Ultrahand Overlay, a new folder named `ultrahand` will be created within the root config folder on your SD card (`/config/ultrahand/`) along with a `config.ini` file containing various Ultrahand settings.
-4. Launch Ultrahand (similarly to `Tesla Menu`) with Tesla's default hotkeys or Ultrahand's (`ZL+ZR+DDOWN`).  A new folder will be made (`/switch/.packages/`) with a preset `package.ini` file for your base menu commands.
+- Du kannst `A` klicken, um jeden Befehl auszuführen, sowie `MINUS`, um die einzelnen Befehlszeilen anzuzeigen/auszuführen, die im Ini für die Ausführung geschrieben wurden.
+- Du kannst auf dem Hauptmenü `PLUS` drücken, um das Einstellungsmenü zu öffnen.
+- Du kannst auf einer Überlagerung/einem Paket oben auf `X` klicken, um sie zu favorisieren.
+- Du kannst auf einer Überlagerung/einem Paket oben auf `Y` klicken, um zusätzliche Einstellungen zu konfigurieren.
 
-5. Place your custom `package.ini` package file in your Ultrahand package directory (`/switch/.packages/<PACKAGE_NAME>/`). This file will contains the commands for your custom Ultrahand package.
-6. Your commands will now show up on the packages menu within Ultrahand.
+Für zusätzliche Unterstützung bei benutzerdefinierten Paketen kannst du das [BlueHAND Overlay Wiki](https://github.com/glitched-nx/BlueHAND-Overlay/wiki) besuchen.
 
-## Additional Features
-- You can click `A` to execute any command as well as click `MINUS` to view/execute the individual command lines written in the ini for execution.
-- You can click `PLUS` on the main menu to enter the settings menu.
-- You can click `X` on top of an overlay/package to star them.
-- You can click `Y` on top of an overlay/package to configure additional settings.
+### Nintendo Switch Kompatibilität
 
-For additional assistance with custom packages, feel free to checkout the [Ultrahand Overlay Wiki](https://github.com/ppkantorski/Ultrahand-Overlay/wiki).
+Um das BlueHAND Overlay auf der Nintendo Switch auszuführen, musst du die erforderliche [Homebrew-Umgebung](https://github.com/Atmosphere-NX/Atmosphere) auf deiner Konsole mit HOS 16.0
 
-### Nintendo Switch Compatibility
-To run Ultrahand Overlay on the Nintendo Switch, you need to have the necessary [homebrew environment](https://github.com/Atmosphere-NX/Atmosphere) set up on your console running HOS 16.0.0+. Once you have the homebrew environment set up, you can transfer the compiled .ovl to your Switch and launch it using your old `Tesla Menu` hotkeys.
+.0+ eingerichtet haben. Sobald du die Homebrew-Umgebung eingerichtet hast, kannst du die kompilierte .ovl auf deine Switch übertragen und sie mit deinen alten `Tesla Menu`-Hotkeys starten.
 
-Please note that running homebrew software on your Nintendo Switch may void your warranty and can carry certain risks. Ensure that you understand the implications and follow the appropriate guidelines and precautions when using homebrew software.
+Bitte beachte, dass das Ausführen von Homebrew-Software auf deiner Nintendo Switch deine Garantie ungültig machen und bestimmte Risiken mit sich bringen kann. Stelle sicher, dass du die Auswirkungen verstehst und die entsprechenden Richtlinien und Vorsichtsmaßnahmen befolgst, wenn du Homebrew-Software verwendest.
 
-### Compilation Prerequisites
+### Kompilierung & Abhängigkeiten
 
-To compile and run the software, you need to have the following C/C++ dependencies installed:
+Um die Software zu kompilieren und auszuführen, müssen die folgenden C/C++-Abhängigkeiten installiert sein:
 
 - [libultra](lib/libultra)
 - [custom libtesla](lib/libtesla)
+
 - switch-curl
 - switch-zziplib
 - switch-mbedtls
 - switch-jansson
 
+Please note that running homebrew software on your Nintendo Switch may void your warranty and can carry certain risks. Ensure that you understand the implications and follow the appropriate guidelines and precautions when using homebrew software.
 
-## Contributing
+## Hinweise zum Fork
 
-Contributions are welcome! If you have any ideas, suggestions, or bug reports, please raise an [issue](https://github.com/ppkantorski/Ultrahand-Overlay/issues/new/choose), submit a [pull request](https://github.com/ppkantorski/Ultrahand-Overlay/compare) or reach out to me directly on [GBATemp](https://gbatemp.net/threads/ultrahand-overlay-the-fully-craft-able-overlay-executor.633560/).
+Hierbei handelt es sich um einen Fork des Original-Projekts [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay) von [**ppkantorski**](https://github.com/ppkantorski), dem Schöpfer des Projekts. Die Repository ist vollständig ins Deutsche übersetzt worden. Dazu zählen BlueHAND selbst, die readme.md-Doku, alle Paket-Beispiele und Beispiel-Befehle, sowie deren readme.md-Doku und die Wiki-Doku.
 
-## License
+## Beiträge bitte an das original Repository: [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay)  
+
+Beiträge sind willkommen! Wenn du Ideen, Vorschläge oder Fehlermeldungen hast, bitte erstelle ein [Issue](https://github.com/ppkantorski/BlueHAND-Overlay/issues/new/choose), reiche einen [Pull-Request](https://github.com/ppkantorski/Ultrahand-Overlay/compare) ein oder kontaktiere mich direkt auf [GBATemp](https://gbatemp.net/threads/ultrahand-overlay-the-fully-craft-able-overlay-executor.633560/).
+
+## Lizenz
 
 This project is licensed and distributed under [GPLv2](LICENSE) with a custom library utilizing [CC-BY-4.0](SUB_LICENSE).
 
