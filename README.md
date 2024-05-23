@@ -1,6 +1,6 @@
-# BlueHAND Overlay
+# BlueHAND
 
-Das BlueHAND Overlay ist ein Ersatz für das [Tesla Menu](https://github.com/WerWolv/Tesla-Menu), das von Grund auf auf [libtesla](https://github.com/WerWolv/libtesla) aufgebaut ist und leistungsstarke C/C++-Befehle über die Verwendung einer eigenen interpretativen Programmiersprache (ähnlich wie Shell/BASH) bietet. Es ist ein vielseitiges Tool, das es dir ermöglicht, benutzerdefinierte Befehls basierte Pakete zu erstellen und zu teilen, um die Verwaltung von Einstellungen, Dateien und Verzeichnissen auf deiner Nintendo Switch zu verbessern.
+BlueHAND (Ultrahand Overlay) ist ein Ersatz für das [Tesla Menu](https://github.com/WerWolv/Tesla-Menu), das von Grund auf auf [libtesla](https://github.com/WerWolv/libtesla) aufgebaut ist und leistungsstarke C/C++-Befehle über die Verwendung einer eigenen interpretativen Programmiersprache (ähnlich wie Shell/BASH) bietet. Es ist ein vielseitiges Tool, das es dir ermöglicht, benutzerdefinierte Befehls basierte Pakete zu erstellen und zu teilen, um die Verwaltung von Einstellungen, Dateien und Verzeichnissen auf deiner Nintendo Switch zu verbessern.
 
 [![Ultrahand Logo](.pics/banner.gif)](https://gbatemp.net/threads/ultrahand-overlay-the-fully-craft-able-overlay-executor.633560/)
 
@@ -8,7 +8,7 @@ Mit BlueHAND hast du die Flexibilität, dein Dateimanagementsystem nach deinen B
 
 ## Funktionen
 
-Das BlueHAND Overlay bietet derzeit folgende Funktionen:
+BlueHAND Overlay bietet derzeit folgende Funktionen:
 
 ## Screenshots
 
@@ -47,10 +47,10 @@ Um BlueHAND zu verwenden, befolge diese Schritte:
 1. Lade die neueste [nxovloader](https://github.com/WerWolv/nx-ovlloader) herunter und installiere sie.
 2. Lade das neueste BlueHAND (Fork) [ovlmenu.ovl](https://github.com/glitched-nx/BlueHAND-Overlay/releases/latest/download/ovlmenu.ovl) herunter und platziere es unter `/switch/.overlays/`.
     - WARNUNG: Dies überschreibt `Tesla Menu`, wenn es bereits installiert ist.
-3. Nach der Installation des BlueHAND Overlays wird ein neuer Ordner namens `ultrahand` im config Verzeichnis auf deiner SD-Karte (`/config/ultrahand/`) zusammen mit einer `config.ini`-Datei erstellt, die verschiedene BlueHAND-Einstellungen enthält.
+3. Nach der Installation von BlueHAND wird ein neuer Ordner namens `ultrahand` im config Verzeichnis auf deiner SD-Karte (`/config/ultrahand/`) zusammen mit einer `config.ini`-Datei erstellt, die verschiedene BlueHAND-Einstellungen enthält.
 4. Starte BlueHAND (ähnlich wie `Tesla Menu`) mit deiner festgelegten Tesla Tasten-Kombi oder BlueHAND's (`L+R+PLUS`). Es wird ein neuer Ordner (`/switch/.packages/`) mit einer vordefinierten `package.ini`-Datei für deine Grundmenübefehle erstellt.
 
-5. Platziere deine benutzerdefinierte `package.ini`-Paketdatei in deinem BlueHAND-Paketverzeichnis (`/switch/.packages/<PACKAGE_NAME>/`). Diese Datei enthält die Befehle für dein benutzerdefiniertes BlueHAND-Paket.
+5. Platziere deine benutzerdefinierte `package.ini`-Paketdatei in deinem Ultrahand-Paketverzeichnis (`/switch/.packages/<PACKAGE_NAME>/`). Diese Datei enthält die Befehle für dein benutzerdefiniertes Ultrahand-Paket.
 6. Deine Befehle werden nun im Paketmenü innerhalb von BlueHAND angezeigt.
 
 ## Zusätzliche Funktionen
@@ -82,17 +82,15 @@ Um die Software zu kompilieren und auszuführen, müssen die folgenden C/C++-Abh
 - switch-mbedtls
 - switch-jansson
 
-Please note that running homebrew software on your Nintendo Switch may void your warranty and can carry certain risks. Ensure that you understand the implications and follow the appropriate guidelines and precautions when using homebrew software.
+## Hinweise zum BlueHAND
 
-## Hinweise zum Fork
+BlueHAND ist ein Fork des ursprünglichen Projekts [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay) von [**ppkantorski**](https://github.com/ppkantorski), dem Schöpfer des Projekts. Die Repository ist vollständig ins Deutsche übersetzt worden. Dazu zählen BlueHAND selbst, die readme.md-Doku, alle Paket-Beispiele und Beispiel-Befehle, sowie deren readme.md-Doku und die Wiki-Doku.
 
-Hierbei handelt es sich um einen Fork des Original-Projekts [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay) von [**ppkantorski**](https://github.com/ppkantorski), dem Schöpfer des Projekts. Die Repository ist vollständig ins Deutsche übersetzt worden. Dazu zählen BlueHAND selbst, die readme.md-Doku, alle Paket-Beispiele und Beispiel-Befehle, sowie deren readme.md-Doku und die Wiki-Doku.
+## For Contributions, please create a Pull Request to the original repository: [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay)  
 
-## Beiträge bitte an das original Repository: [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay)  
+Contributions are welcome! If you have any ideas, suggestions, or bug reports, please raise an [issue](https://github.com/ppkantorski/Ultrahand-Overlay/issues/new/choose), submit a [pull request](https://github.com/ppkantorski/Ultrahand-Overlay/compare) or reach out to me directly on [GBATemp](https://gbatemp.net/threads/ultrahand-overlay-the-fully-craft-able-overlay-executor.633560/).
 
-Beiträge sind willkommen! Wenn du Ideen, Vorschläge oder Fehlermeldungen hast, bitte erstelle ein [Issue](https://github.com/ppkantorski/BlueHAND-Overlay/issues/new/choose), reiche einen [Pull-Request](https://github.com/ppkantorski/Ultrahand-Overlay/compare) ein oder kontaktiere mich direkt auf [GBATemp](https://gbatemp.net/threads/ultrahand-overlay-the-fully-craft-able-overlay-executor.633560/).
-
-## Lizenz
+## License
 
 This project is licensed and distributed under [GPLv2](LICENSE) with a custom library utilizing [CC-BY-4.0](SUB_LICENSE).
 
