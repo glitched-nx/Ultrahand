@@ -3414,6 +3414,7 @@ namespace tsl {
             
                 y = 50;
                 offset = 0;
+
             
                 bool isUltrahand = (this->m_title == CAPITAL_ULTRAHAND_PROJECT_NAME && 
                                     this->m_subtitle.find("Ultrahand Package") == std::string::npos && 
@@ -3425,6 +3426,8 @@ namespace tsl {
             
                     std::string firstHalf = "Ultra";
                     std::string secondHalf = "hand";
+
+
                     
                     x = 20;
                     fontSize = 42;
