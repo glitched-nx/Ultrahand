@@ -8,7 +8,7 @@ Mit BlueHAND hast du die Flexibilität, dein Dateimanagementsystem nach deinen B
 
 ## Funktionen
 
-BlueHAND Overlay bietet derzeit folgende Funktionen:
+BlueHAND bietet derzeit folgende Funktionen:
 
 ## Screenshots
 
@@ -64,9 +64,7 @@ Für zusätzliche Unterstützung bei benutzerdefinierten Paketen kannst du das [
 
 ### Nintendo Switch Kompatibilität
 
-Um das BlueHAND Overlay auf der Nintendo Switch auszuführen, musst du die erforderliche [Homebrew-Umgebung](https://github.com/Atmosphere-NX/Atmosphere) auf deiner Konsole mit HOS 16.0
-
-.0+ eingerichtet haben. Sobald du die Homebrew-Umgebung eingerichtet hast, kannst du die kompilierte .ovl auf deine Switch übertragen und sie mit deinen alten `Tesla Menu`-Hotkeys starten.
+Um das BlueHAND Overlay auf der Nintendo Switch auszuführen, musst du die erforderliche [Homebrew-Umgebung](https://github.com/Atmosphere-NX/Atmosphere) auf deiner Konsole mit HOS 16.0.0+ eingerichtet haben. Sobald du die Homebrew-Umgebung eingerichtet hast, kannst du die kompilierte .ovl auf deine Switch übertragen und sie mit deinen alten `Tesla Menu`-Hotkeys starten.
 
 Bitte beachte, dass das Ausführen von Homebrew-Software auf deiner Nintendo Switch deine Garantie ungültig machen und bestimmte Risiken mit sich bringen kann. Stelle sicher, dass du die Auswirkungen verstehst und die entsprechenden Richtlinien und Vorsichtsmaßnahmen befolgst, wenn du Homebrew-Software verwendest.
 
@@ -82,7 +80,7 @@ Um die Software zu kompilieren und auszuführen, müssen die folgenden C/C++-Abh
 - switch-mbedtls
 - switch-jansson
 
-## Hinweise zum BlueHAND
+## Hinweise zu BlueHAND
 
 BlueHAND ist ein Fork des ursprünglichen Projekts [**Ultrahand-Overlay**](https://github.com/ppkantorski/Ultrahand-Overlay) von [**ppkantorski**](https://github.com/ppkantorski), dem Schöpfer des Projekts. Die Repository ist vollständig ins Deutsche übersetzt worden. Dazu zählen BlueHAND selbst, die readme.md-Doku, alle Paket-Beispiele und Beispiel-Befehle, sowie deren readme.md-Doku und die Wiki-Doku.
 
