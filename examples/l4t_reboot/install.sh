@@ -1,46 +1,46 @@
 #!/bin/bash
 ################################################################################
-# File: install.sh
-# Author: ppkantorski
-# Description:
-#   This script is part of the Ultrahand-Overlay project and is responsible for
-#   installing and configuring the necessary components of the project. It
-#   automates the setup process for the Ultrahand-Overlay on your system.
+# Datei: install.sh
+# Autor: ppkantorski
+# Beschreibung:
+#   Dieses Skript ist Teil des Projekts Ultrahand-Overlay und ist verantwortlich für
+#   die Installation und Konfiguration der erforderlichen Komponenten des Projekts. Es
+#   automatisiert den Einrichtungsprozess für das Ultrahand-Overlay auf Ihrem System.
 #
-#   Key Features:
-#   - Installation of required dependencies.
-#   - Configuration of system settings.
-#   - Setup of the Ultrahand-Overlay project.
+#   Hauptfunktionen:
+#   - Installation der erforderlichen Abhängigkeiten.
+#   - Konfiguration von Systemeinstellungen.
+#   - Einrichtung des Projekts Ultrahand-Overlay.
 #
-#   Note: Please refer to the project documentation and README.md for detailed
-#   information on how to use and configure this script within the Ultrahand-Overlay.
+#   Hinweis: Bitte beachte die Projekt-Dokumentation und README.md für detaillierte
+#   Informationen zur Verwendung und Konfiguration dieses Skripts im Rahmen des Ultrahand-Overlay.
 #
-#   For the latest updates and contributions, visit the project's GitHub repository.
-#   (GitHub Repository: https://github.com/ppkantorski/Ultrahand-Overlay)
+#   Für die neuesten Updates und Beiträge besuche das GitHub-Repository des Projekts.
+#   (GitHub-Repository: https://github.com/ppkantorski/Ultrahand-Overlay)
 #
 # Copyright (c) 2023 ppkantorski
-# All rights reserved.
+# Alle Rechte vorbehalten.
 ################################################################################
 
-# Set the path to your Python script
-script_path="/usr/local/bin/l4t_reboot.py"
+# Setze den Pfad zu deinem Python-Skript
+skript_pfad="/usr/local/bin/l4t_reboot.py"
 
-# Move the script to the desired location
-mv "$(dirname "$0")/l4t_reboot.py" "$script_path"
-chmod +x "$script_path"
+# Verschiebe das Skript an den gewünschten Ort
+mv "$(dirname "$0")/l4t_reboot.py" "$skript_pfad"
+chmod +x "$skript_pfad"
 
-# Create the .desktop file
+# Erstelle die .desktop-Datei
 echo "[Desktop Entry]
 Type=Application
-Exec=/usr/bin/python3 $script_path
+Exec=/usr/bin/python3 $skript_pfad
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
 Name[en_US]=L4T-Reboot
 Name=L4T-Reboot
-Comment[en_US]=Run L4T-Reboot on startup
-Comment=Run L4T-Reboot on startup
+Comment[en_US]=Führe L4T-Reboot beim Start aus
+Comment=Führe L4T-Reboot beim Start aus
 Terminal=false" > ~/.config/autostart/L4T-Reboot.desktop
 
-# Make the .desktop file executable
+# Mache die .desktop-Datei ausführbar
 chmod +x ~/.config/autostart/L4T-Reboot.desktop

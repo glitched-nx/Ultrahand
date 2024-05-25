@@ -1,27 +1,27 @@
-# Broomstick (now deprecated on v1.3.9+)
+# Broomstick (ab v1.3.9+ nicht mehr unterstützt)
 
-The Broomstick package allows you to offload and restore specific overlays on your device.
+Das Broomstick-Paket ermöglicht es dir, bestimmte Overlays auf deinem Gerät zu entladen und wiederherzustellen.
 
-## Configuration
+## Konfiguration
 
-The `package.ini` file contains the following configurations:
+Die Datei `package.ini` enthält folgende Konfigurationen:
 
-- `[Offload Overlays]`: Moves selected overlays to a designated offload directory.
-- `[Restore Overlays]`: Restores previously offloaded overlays back to their original location.
+- `[Offload Overlays]`: Verschiebt ausgewählte Overlays in ein bestimmtes Entladungsverzeichnis.
+- `[Restore Overlays]`: Stellt zuvor entladene Overlays an ihren ursprünglichen Speicherort zurück.
 
-Each configuration has a set of commands that perform the offloading or restoration of overlays.
+Jede Konfiguration hat eine Reihe von Befehlen, die das Entladen oder die Wiederherstellung von Overlays durchführen.
 
-## Usage
+## Verwendung
 
-To use Broomstick:
+Um Broomstick zu verwenden:
 
-1. Open the `package.ini` file located in the `examples/Broomstick` directory.
-2. Uncomment the desired configuration and its corresponding commands by removing the semicolon (`;`) at the beginning of each line.
-3. Save the `package.ini` file after making the necessary changes.
-4. Copy the `Broomstick` directory to your device under the appropriate location.
+1. Öffne die Datei `package.ini` im Verzeichnis `examples/Broomstick`.
+2. Entkommentiere die gewünschte Konfiguration und ihre entsprechenden Befehle, indem du das Semikolon (`;`) am Anfang jeder Zeile entfernst.
+3. Speichere die `package.ini`-Datei nach den vorgenommenen Änderungen.
+4. Kopiere das Verzeichnis `Broomstick` auf dein Gerät an den entsprechenden Ort.
 
-Note: Offloading overlays can help improve performance and free up system resources, but it may also affect the functionality of certain features or applications that rely on those overlays. Use this feature with caution and ensure that you understand the potential implications.
+Hinweis: Das Entladen von Overlays kann die Leistung verbessern und Systemressourcen freigeben, kann aber auch die Funktionalität bestimmter Funktionen oder Anwendungen beeinträchtigen, die auf diese Overlays angewiesen sind. Verwende diese Funktion vorsichtig und stelle sicher, dass du die potenziellen Auswirkungen verstehst.
 
-## Additional Information
+## Weitere Informationen
 
-For more details on the Ultrahand Overlay project and its features, please refer to the [official GitHub repository](https://github.com/ppkantorski/Ultrahand-Overlay).
+Für weitere Details zum Ultrahand Overlay-Projekt und seinen Funktionen, siehe das [offizielle GitHub-Repository](https://github.com/ppkantorski/Ultrahand-Overlay).
