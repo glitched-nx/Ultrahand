@@ -1,40 +1,40 @@
-# Ultrahand Overlay - Examples
+# Ultrahand Overlay - Beispiele
 
-This repository contains a collection of useful examples that demonstrate the capabilities and usage of Ultrahand Overlay.
+Dieses Repository enthält eine Sammlung nützlicher Beispiele, die die Möglichkeiten und die Verwendung von Ultrahand Overlay demonstrieren.
 
-Ultrahand Overlay is a powerful tool that allows you to customize and enhance your device's overlays in order to optimize performance, improve functionality, and personalize your experience.
+Ultrahand Overlay ist ein leistungsstarkes Tool, mit dem du die Overlays deines Geräts anpassen und verbessern kannst, um die Leistung zu optimieren, die Funktionalität zu verbessern und dein Erlebnis zu personalisieren.
 
-## Examples
+## Beispiele
 
-- [Cool Curves](Cool%20Curves/README.md): Explore the Cool Curves example to discover how to modify and optimize the fan curve settings through a simple interface.
+- [Cool Curves](Cool%20Curves/README.md): Entdecke das Cool Curves Beispiel, um zu erfahren, wie du die Lüfterkurveneinstellungen durch eine einfache Benutzeroberfläche modifizieren und optimieren kannst.
 
-- [Host Guard](Host%20Guard/README.md): The Host Guard example demonstrates the utilization of overlay customization to enhance security and protect your device from servers you may not want your device to access.
+- [Host Guard](Host%20Guard/README.md): Das Host Guard Beispiel demonstriert die Nutzung der Overlay-Anpassung zur Verbesserung der Sicherheit und zum Schutz deines Geräts vor Servern, auf die du möglicherweise nicht zugreifen möchtest.
 
-- [Mod Master](Mod%20Master/README.md): Dive into the Mod Master example to learn how to leverage Ultrahand Overlay to manage and optimize your favorite game modifications.
+- [Mod Master](Mod%20Master/README.md): Tauche ein in das Mod Master Beispiel, um zu erfahren, wie du Ultrahand Overlay nutzen kannst, um deine Lieblings-Spielmodifikationen zu verwalten und zu optimieren.
 
-- [OC Toolkit](OC%20Toolkit/README.md): OC Toolkit demonstrates how to push your device's performance to the limit by applying custom overclocks, timings, and undervoltage settings to kip files.
+- [OC Toolkit](OC%20Toolkit/README.md): OC Toolkit zeigt, wie du die Leistung deines Geräts bis an die Grenze ausreizen kannst, indem du benutzerdefinierte Übertaktungen, Timing- und Undervoltage-Einstellungen auf Kip-Dateien anwendest.
 
-- [Broomstick](Broomstick/README.md): The Broomstick example provides a convenient way to offload and restore specific overlays, allowing you to free up system resources and improve performance.
+- [Broomstick](Broomstick/README.md): Das Broomstick Beispiel bietet eine bequeme Möglichkeit, bestimmte Overlays zu entladen und wiederherzustellen, um Systemressourcen freizugeben und die Leistung zu verbessern.
 
-- [l4t_reboot](l4t_reboot/README.md): Use the l4t_reboot utility on Linux to perform system reboots into Ubuntu with ease.
+- [l4t_reboot](l4t_reboot/README.md): Verwende das l4t_reboot-Dienstprogramm unter Linux, um Systemneustarts in Ubuntu einfach durchzuführen.
 
-- [config.ini](https://github.com/ppkantorski/Ultrahand-Overlay/blob/main/examples/config.ini): Basic system commands for your device.
+- [config.ini](https://github.com/glitched-nx/Ultrahand-Overlay/blob/main/examples/config.ini): Grundlegende Systembefehle für dein Gerät.
 
-## Getting Started
+## Erste Schritte
 
-To use these examples, follow these steps:
+Um diese Beispiele zu verwenden, befolge diese Schritte:
 
-1. Clone or download this repository to your local machine.
-2. Copy the contents of the desired example folder to `/switch/.packages/` on your device.
-3. Follow the specific instructions provided in each example's README file to configure and apply the overlays.
+1. Klone oder lade dieses Repository auf deinen lokalen Rechner herunter.
+2. Kopiere den Inhalt des gewünschten Beispielordners nach `/switch/.packages/` auf deinem Gerät.
+3. Befolge die spezifischen Anweisungen in der README-Datei jedes Beispiels, um die Overlays zu konfigurieren und anzuwenden.
 
-Note: Before applying any overlays or modifications, make sure you understand the potential impact on your device and follow the instructions carefully.
+Hinweis: Bevor du Overlays oder Modifikationen anwendest, stelle sicher, dass du die möglichen Auswirkungen auf dein Gerät verstehst und die Anweisungen sorgfältig befolgst.
 
-## Contributing
+## Mitarbeit
 
-Contributions from the community are welcome! If you have any improvements, bug fixes, or new examples to share, feel free to submit a pull request.
+Beiträge aus der Community sind willkommen! Wenn du Verbesserungen, Fehlerkorrekturen oder neue Beispiele teilen möchtest, zögere nicht, einen Pull-Request einzureichen.
 
 
 Copyright (c) 2024 ppkantorski
 
-All rights reserved.
+Alle Rechte vorbehalten.

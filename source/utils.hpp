@@ -107,6 +107,7 @@ bool usingMariko = util::IsMariko();
 
 void initializeTheme(std::string themeIniPath = THEME_CONFIG_INI_PATH) {
     tsl::hlp::ini::IniData themeData;
+
     bool initialize = false;
 
     if (isFileOrDirectory(themeIniPath)) {
