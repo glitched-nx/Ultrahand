@@ -44,7 +44,7 @@ const std::string OVERLAY_PATH = "sdmc:/switch/.overlays/";
 const std::string TESLA_CONFIG_INI_PATH = "sdmc:/config/tesla/config.ini";
 const std::string OVERLAYS_INI_FILEPATH = "sdmc:/config/ultrahand/overlays.ini";
 const std::string PACKAGES_INI_FILEPATH = "sdmc:/config/ultrahand/packages.ini";
-const std::string ULTRAHAND_REPO_URL = "https://github.com/glitched-nx/BlueHAND-Overlay/";
+const std::string ULTRAHAND_REPO_URL = "https://github.com/glitched-nx/BlueHAND/";
 
 
 const std::string TESLA_COMBO_STR = "L+DDOWN+RS";
