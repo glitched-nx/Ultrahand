@@ -56,7 +56,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 
 APP_TITLE	:= UltraBLUE
 APP_AUTHOR	:= ppkantorski, glitched-nx
-APP_VERSION	:= 1.6.0_blue
+APP_VERSION	:= 1.6.2_blue
 TARGET	    := ovlmenu
 BUILD	    := build
 SOURCES	    := source common 
