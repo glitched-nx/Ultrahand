@@ -3574,7 +3574,7 @@ namespace tsl {
                 
                 y = 50;
                 offset = 0;
-                
+              
                 bool isUltrahand = (this->m_title == CAPITAL_ULTRAHAND_PROJECT_NAME && 
                                     this->m_subtitle.find("Ultrahand Package") == std::string::npos && 
                                     this->m_subtitle.find("Ultrahand Script") == std::string::npos);
@@ -3583,8 +3583,10 @@ namespace tsl {
                     PCB_temperatureStringSTD.clear();
                     SOC_temperatureStringSTD.clear();
                     
-                    std::string firstHalf = "Ultra";
-                    std::string secondHalf = "hand";
+                    std::string firstHalf = "Blue";
+                    std::string secondHalf = "HAND";
+
+
                     
                     x = 20;
                     fontSize = 42;
