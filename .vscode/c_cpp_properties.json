@@ -1,0 +1,25 @@
+{
+    "configurations": [
+      {
+        "name": "windows-gcc-arm64",
+        "includePath": [
+          "${workspaceFolder}/**",
+          "C:/msys64/opt/devkitpro/libnx/include",
+          "C:/msys64/opt/devkitpro/portlibs/switch/include",
+          "C:/msys64/opt/devkitpro/devkitA64/aarch64-none-elf/include",
+          "C:/msys64/mingw64/include"
+        ],
+        "defines": [
+          "__SWITCH__"
+        ],
+        "compilerPath": "C:/msys64/opt/devkitpro/devkitA64/bin/aarch64-none-elf-gcc.exe",
+        "cStandard": "c11",
+        "cppStandard": "c++17",
+        "intelliSenseMode": "windows-gcc-arm64",
+        "compilerArgs": [
+          "--sysroot=C:/msys64/opt/devkitpro/devkitA64/aarch64-none-elf"
+        ]
+      }
+    ],
+    "version": 4
+  }

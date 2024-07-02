@@ -1,39 +1,39 @@
-# l4t_reboot - Ubuntu Helper Function (deprecated)
+# l4t_reboot - Ubuntu Hilfsfunktion (veraltet)
 
-"l4t_reboot" is an Ubuntu helper function designed to streamline the handling of L4T (Linux for Tegra) reboots. This tool provides a convenient way to manage and execute reboot operations on your Ubuntu-based system.
+"l4t_reboot" ist eine Ubuntu-Hilfsfunktion, die entwickelt wurde, um die Handhabung von L4T (Linux für Tegra) Neustarts zu vereinfachen. Dieses Tool bietet eine bequeme Möglichkeit, Neustartoperationen auf Ihrem Ubuntu-basierten System zu verwalten und auszuführen.
 
-## Purpose
+## Zweck
 
-The purpose of l4t_reboot is to simplify the process of handling L4T reboots in an Ubuntu environment. It offers a set of functions and utilities that assist in managing the reboot process smoothly and efficiently.
+Der Zweck von l4t_reboot besteht darin, den Prozess der Handhabung von L4T-Neustarts in einer Ubuntu-Umgebung zu vereinfachen. Es bietet eine Reihe von Funktionen und Dienstprogrammen, die dazu beitragen, den Neustartprozess reibungslos und effizient zu gestalten.
 
-## Features
+## Funktionen
 
-- **Easy Reboot Execution**: l4t_reboot provides a straightforward method to initiate L4T reboots from your Ubuntu system, eliminating the need for complex commands or manual intervention.
+- **Einfache Neustartausführung**: l4t_reboot bietet eine unkomplizierte Methode, um L4T-Neustarts von Ihrem Ubuntu-System aus zu initiieren, wodurch komplexe Befehle oder manuelle Eingriffe vermieden werden.
 
-- **Ubuntu-Specific Setup**: This utility includes specific files, such as `config.ini`, that are tailored for Ubuntu setups. The `config.ini` file assumes a third entry in `hekate_ipl.ini` for your Linux setup, allowing for seamless integration with Ubuntu-based systems.
+- **Spezifische Ubuntu-Konfiguration**: Dieses Dienstprogramm enthält spezifische Dateien wie `config.ini`, die für Ubuntu-Setups zugeschnitten sind. Die Datei `config.ini` geht von einem dritten Eintrag in `hekate_ipl.ini` für Ihr Linux-Setup aus, was eine nahtlose Integration mit Ubuntu-basierten Systemen ermöglicht.
 
-## Getting Started
+## Erste Schritte
 
-To use l4t_reboot on your Ubuntu system, follow these steps:
+Um l4t_reboot auf Ihrem Ubuntu-System zu verwenden, befolgen Sie diese Schritte:
 
-1. Clone or download this repository to your local machine.
+1. Klone oder lade dieses Repository auf deinen lokalen Rechner herunter.
 
-2. Ensure that you have the necessary prerequisites installed, including a working Ubuntu environment and the required dependencies.
+2. Stelle sicher, dass du die erforderlichen Voraussetzungen installiert hast, einschließlich einer funktionierenden Ubuntu-Umgebung und der erforderlichen Abhängigkeiten.
 
-3. Configure `config.ini` to match your specific Linux setup. Make sure to set the appropriate entries in `hekate_ipl.ini` for successful execution.
+3. Konfiguriere `config.ini`, um deinem spezifischen Linux-Setup zu entsprechen. Stelle sicher, dass du die entsprechenden Einträge in `hekate_ipl.ini` für eine erfolgreiche Ausführung festlegst.
 
-4. Execute the `l4t_reboot.py` script to initiate the L4T reboot. You can either run the script directly or utilize the provided helper functions for more convenient usage.
+4. Führe das Skript `l4t_reboot.py` aus, um den L4T-Neustart zu initiieren. Du kannst das Skript entweder direkt ausführen oder die bereitgestellten Hilfsfunktionen für eine bequemere Verwendung nutzen.
 
-Note: It is essential to review and understand the implications of rebooting your system before executing any commands. Ensure that you have saved any necessary data or configurations to prevent data loss or system instability.
+Hinweis: Es ist wichtig, die Auswirkungen des Neustarts deines Systems zu überprüfen und zu verstehen, bevor du irgendwelche Befehle ausführst. Stelle sicher, dass du alle erforderlichen Daten oder Konfigurationen gespeichert hast, um Datenverlust oder Systeminstabilität zu vermeiden.
 
-## Contributions
+## Beiträge
 
-Contributions to l4t_reboot are welcome! If you have any improvements, bug fixes, or additional features to suggest, please feel free to submit a pull request.
+Beiträge zu l4t_reboot sind willkommen! Wenn du Verbesserungen, Fehlerkorrekturen oder zusätzliche Funktionen vorschlagen möchtest, zögere bitte nicht, einen Pull-Request einzureichen.
 
-## License
+## Lizenz
 
-This project is licensed under the [CC-BY-NC-4.0 License](LICENSE).
+Dieses Projekt steht unter der [CC-BY-NC-4.0 Lizenz](LICENSE).
 
 Copyright (c) 2023 ppkantorski
 
-All rights reserved.
+Alle Rechte vorbehalten.
