@@ -18,6 +18,8 @@ BlueHAND bietet derzeit folgende Funktionen:
 
 ## Screenshots
 
+![Slideshow](.pics/slideshow.gif)
+
 ![Slideshow](https://gbatemp.net/attachments/ezgif-4-024e7852d3-gif.400949/)
 
 - Verzeichnisse erstellen:
@@ -46,6 +48,15 @@ BlueHAND bietet derzeit folgende Funktionen:
 
 ## Erste Schritte
 
+- Convert Mods:
+  - Convert `pchtxt` mods into `ips` or `cheats` format.
+
+- System Commands:
+  - There are a variety of system commands that users can utilize.  These include functions to shutdown, reboot, reboot directly into Hekate entries/modes, manipulate the screen's backlight, and turn off all bluetooth controllers.
+
+- Run Commmands On Boot:
+  - Users can also utilize their own `/switch/.packages/boot_package.ini` file (with a command section `boot`) to run a series of commands once upon device boot-up.
+   
 ### Verwendung
 
 Um BlueHAND zu verwenden, befolge diese Schritte:
