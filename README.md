@@ -12,15 +12,15 @@ BlueHAND (Ultrahand Overlay) ist ein Ersatz für das [Tesla Menu](https://github
 
 Mit BlueHAND hast du die Flexibilität, dein Dateimanagementsystem nach deinen Bedürfnissen anzupassen und zu formen, und erhältst damit eine größere Kontrolle über deine Systemkonfigurationen.
 
-## Funktionen
-
-BlueHAND bietet derzeit folgende Funktionen:
-
 ## Screenshots
 
 ![Slideshow](.pics/slideshow.gif)
 
 ![Slideshow](https://gbatemp.net/attachments/ezgif-4-024e7852d3-gif.400949/)
+
+## Funktionen
+
+BlueHAND bietet derzeit folgende Funktionen:
 
 - Verzeichnisse erstellen:
   - Erstelle mühelos Verzeichnisse auf deiner SD-Karte, indem du den Verzeichnispfad angibst. BlueHAND übernimmt den Erstellungsprozess für dich.
@@ -45,8 +45,6 @@ BlueHAND bietet derzeit folgende Funktionen:
 
 - Hex-Dateien bearbeiten:
   - Führe hexadezimale Bearbeitungen von Dateien auf deiner SD-Karte durch. Bearbeite die Binärdaten direkt und ermögliche so eine präzise Kontrolle über deine Daten. Die Hex-Dateien-Bearbeitungsfunktion von BlueHAND ermöglicht es dir, Dateien in ihrer Rohform zu analysieren, zu bearbeiten und anzupassen.
-
-## Erste Schritte
 
 - Convert Mods:
   - Convert `pchtxt` mods into `ips` or `cheats` format.
