@@ -1,36 +1,36 @@
 # Mod Master
 
-The Mod Master package provides various modifications and enhancements for your device.
+Das Mod Master-Paket bietet verschiedene Modifikationen und Verbesserungen für dein Gerät.
 
-## Configuration
+## Konfiguration
 
-The `package.ini` file contains the following configurations:
+Die Datei `package.ini` enthält die folgenden Konfigurationen:
 
-- `[*Toggle exeFS Patches]`: Toggles exeFS patches by selection.
-- `[*Toggle Content Mods]`: Toggles content modifications by selection.
-    -  Mods are sorted accordingly within `/switch/.packages/Mod Master/<GAME>/<MOD>/<ID>/...`
-- `[Enable 21:9 Mods]`: Enables 21:9 aspect ratio modifications.
-- `[Disable 21:9 Mods]`: Disables 21:9 aspect ratio modifications.
+- `[*Toggle exeFS Patches]`: Aktiviert bzw. deaktiviert exeFS-Patches durch Auswahl.
+- `[*Toggle Content Mods]`: Aktiviert bzw. deaktiviert Inhaltsmodifikationen durch Auswahl.
+    - Mods sind entsprechend sortiert innerhalb von `/switch/.packages/Mod Master/<SPIEL>/<MOD>/<ID>/...`
+- `[Enable 21:9 Mods]`: Aktiviert Modifikationen für das 21:9-Bildseitenverhältnis.
+- `[Disable 21:9 Mods]`: Deaktiviert Modifikationen für das 21:9-Bildseitenverhältnis.
 
-Each configuration has a set of commands that perform the corresponding actions. The commands include moving, deleting, creating directories, and copying files to specific locations on your device.
+Jede Konfiguration hat eine Reihe von Befehlen, die die entsprechenden Aktionen ausführen. Die Befehle umfassen das Verschieben, Löschen, Erstellen von Verzeichnissen und Kopieren von Dateien an bestimmte Positionen auf deinem Gerät.
 
-## Obtaining Mods
+## Beschaffung von Mods
 
-To use the mods provided in the Mod Master package, you will need to obtain them separately. The mods should be placed in the appropriate folders within the `Mod Master` directory.
+Um die in dem Mod Master-Paket bereitgestellten Mods zu verwenden, musst du sie separat beschaffen. Die Mods sollten in den entsprechenden Ordnern innerhalb des `Mod Master`-Verzeichnisses platziert werden.
 
-Please refer to the shared documentation or additional resources to acquire the specific mods you are interested in. Once you have obtained the mods, place them in the corresponding folders within the `Mod Master` directory.
+Bitte konsultiere die bereitgestellte Dokumentation oder zusätzliche Ressourcen, um die spezifischen Mods zu erhalten, an denen du interessiert bist. Sobald du die Mods erhalten hast, platziere sie in den entsprechenden Ordnern innerhalb des `Mod Master`-Verzeichnisses.
 
-## Usage
+## Verwendung
 
-To use Mod Master:
+Um Mod Master zu verwenden:
 
-1. Open the `package.ini` file located in the `examples/Mod Master` directory.
-2. Uncomment the desired configuration and its corresponding commands by removing the semicolon (`;`) at the beginning of each line.
-3. Save the `package.ini` file after making the necessary changes.
-4. Copy the `Mod Master` directory to your switch under `/config/ultrahand/` by placing it in that location.
+1. Öffne die Datei `package.ini` im Verzeichnis `examples/Mod Master`.
+2. Entkommentiere die gewünschte Konfiguration und die entsprechenden Befehle, indem du das Semikolon (`;`) am Anfang jeder Zeile entfernst.
+3. Speichere die `package.ini`-Datei, nachdem du die erforderlichen Änderungen vorgenommen hast.
+4. Kopiere das Verzeichnis `Mod Master` auf deinen Switch unter `/config/ultrahand/`, indem du es an diesen Ort platzierst.
 
-Note: Make sure you have organized the mods properly within the subdirectories as mentioned in the "Obtaining Mods" section.
+Hinweis: Stelle sicher, dass du die Mods innerhalb der Unterverzeichnisse ordnungsgemäß organisiert hast, wie im Abschnitt "Beschaffung von Mods" beschrieben.
 
-## Additional Information
+## Zusätzliche Informationen
 
-For more details on the Ultrahand Overlay project and its features, please refer to the [official GitHub repository](https://github.com/ppkantorski/Ultrahand-Overlay).
+Für weitere Details zum Ultrahand Overlay-Projekt und seinen Funktionen siehe das [offizielle GitHub-Repository](https://github.com/ppkantorski/Ultrahand-Overlay).

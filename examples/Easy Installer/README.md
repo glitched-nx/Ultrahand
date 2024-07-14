@@ -1,30 +1,30 @@
 # Easy Installer
 
-The Easy Installer package allows you to effortlessly update and install various overlays and packages on your device.
+Das Easy Installer-Paket ermöglicht es dir, mühelos verschiedene Overlays und Pakete auf deinem Gerät zu aktualisieren und zu installieren.
 
-## Overview
+## Übersicht
 
-This README file provides essential information about the Easy Installer, including its features and usage instructions.
+Diese README-Datei enthält wesentliche Informationen zum Easy Installer, einschließlich seiner Funktionen und Verwendungshinweise.
 
-## Features
+## Funktionen
 
-- **Automatic Updates**: Easy Installer automatically fetches the latest overlays and packages, ensuring you have the most up-to-date software.
-- **Effortless Installation**: Installing overlays and packages is as simple as a few clicks or commands.
-- **Customizable**: You can easily customize the installation process to suit your preferences.
+- **Automatische Updates**: Der Easy Installer ruft automatisch die neuesten Overlays und Pakete ab, um sicherzustellen, dass du stets die aktuellste Software hast.
+- **Einfache Installation**: Die Installation von Overlays und Paketen ist so einfach wie ein paar Klicks oder Befehle.
+- **Anpassbar**: Du kannst den Installationsprozess leicht anpassen, um ihn an deine Vorlieben anzupassen.
 
-## Configuration
+## Konfiguration
 
-The `package.ini` file contains the configuration settings for Easy Installer. You can adjust these settings to tailor the installation process to your needs.
+Die Datei `package.ini` enthält die Konfigurationseinstellungen für den Easy Installer. Du kannst diese Einstellungen anpassen, um den Installationsprozess an deine Bedürfnisse anzupassen.
 
 ## Installation
 
-To use Easy Installer:
+Um den Easy Installer zu verwenden:
 
-1. Modify `package.ini` along with the `json repository files` with your desired homebrew/commands. (not necessary)
-2. Save the `package.ini` file after making any changes.
-3. Move the `package.ini` and the `json repository files` to `/switch/.packages/Easy Installer/`.
-4. Run from the Packages menu on Ultrahand.
+1. Passe bei Bedarf `package.ini` zusammen mit den `JSON-Repository-Dateien` mit deinen gewünschten Homebrew/Befehlen an. (nicht unbedingt erforderlich)
+2. Speichere die `package.ini`-Datei nach vorgenommenen Änderungen.
+3. Verschiebe die `package.ini` und die `JSON-Repository-Dateien` nach `/switch/.packages/Easy Installer/`.
+4. Starte den Easy Installer über das Paketmenü auf Ultrahand.
 
-## Additional Information
+## Weitere Informationen
 
-For more details on the Easy Installer and its features, please refer to the [official GitHub repository](https://github.com/ppkantorski/Ultrahand-Overlay).
+Für weitere Details zum Easy Installer und seinen Funktionen, siehe das [GitHub-Repository](https://github.com/glitched-nx/Ultrahand-Overlay).
