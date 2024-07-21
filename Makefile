@@ -56,7 +56,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 
 APP_TITLE	:= BlueHAND
 APP_AUTHOR	:= ppkantorski, glitched-nx
-APP_VERSION	:= 1.6.6_blue
+APP_VERSION	:= 1.6.7_blue
 TARGET	    := ovlmenu
 BUILD	    := build
 SOURCES	    := source common 
