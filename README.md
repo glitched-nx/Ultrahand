@@ -54,7 +54,7 @@ BlueHAND bietet derzeit folgende Funktionen:
 
 - Run Commmands On Boot:
   - Users can also utilize their own `/switch/.packages/boot_package.ini` file (with a command section `boot`) to run a series of commands once upon device boot-up.
-   
+
 ### Verwendung
 
 Um BlueHAND zu verwenden, befolge diese Schritte:
