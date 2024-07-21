@@ -35,6 +35,14 @@ static std::atomic<bool> abortCommand(false);
 static std::atomic<bool> triggerExit(false);
 
 
+bool isDownloadCommand = false;
+bool commandSuccess = false;
+bool refreshGui = false;
+bool interpreterLogging = false;
+
+bool usingErista = util::IsErista();
+bool usingMariko = util::IsMariko();
+
 /**
  * @brief Ultrahand-Overlay Configuration Paths
  *
@@ -53,6 +61,71 @@ static std::atomic<bool> triggerExit(false);
  * and directories.
  */
 
+
+/**
+ * @brief Shuts off all connected controllers.
+ *
+ * This function disconnects all connected controllers by utilizing the Bluetooth manager (btm) service.
+ * It checks the firmware version and uses the appropriate function to get the device condition and disconnects
+ * the controllers.
+ */
+void powerOffAllControllers() {
+    Result rc;
+    static s32 g_connected_count = 0;
+    static BtdrvAddress g_addresses[8] = {};
+
+    // Initialize Bluetooth manager
+    rc = btmInitialize();
+    if (R_FAILED(rc)) {
+        commandSuccess = false;
+        //LogLine("Error btmInitialize: %u - %X\n", rc, rc);
+        return;
+    }
+
+    if (hosversionAtLeast(13, 0, 0)) {
+        BtmConnectedDeviceV13 connected_devices[8];
+        rc = btmGetDeviceCondition(BtmProfile_None, connected_devices, 8, &g_connected_count);
+        if (R_SUCCEEDED(rc)) {
+            for (s32 i = 0; i != g_connected_count; ++i) {
+                g_addresses[i] = connected_devices[i].address;
+            }
+        } else {
+            commandSuccess = false;
+            //LogLine("Error btmGetDeviceCondition: %u - %X\n", rc, rc);
+        }
+    } else {
+        BtmDeviceCondition g_device_condition;
+        rc = btmLegacyGetDeviceCondition(&g_device_condition);
+        if (R_SUCCEEDED(rc)) {
+            g_connected_count = g_device_condition.v900.connected_count;
+            for (s32 i = 0; i != g_connected_count; ++i) {
+                g_addresses[i] = g_device_condition.v900.devices[i].address;
+            }
+        } else {
+            commandSuccess = false;
+            //LogLine("Error btmLegacyGetDeviceCondition: %u - %X\n", rc, rc);
+        }
+    }
+
+    if (R_SUCCEEDED(rc)) {
+        //LogLine("Disconnecting controllers. Count: %u\n", g_connected_count);
+        for (int i = 0; i != g_connected_count; ++i) {
+            Result rc = btmHidDisconnect(g_addresses[i]);
+            if (R_FAILED(rc)) {
+                commandSuccess = false;
+                //LogLine("Error btmHidDisconnect: %u - %X\n", rc, rc);
+            } else {
+                //LogLine("Disconnected Address: %u - %X\n", g_addresses[i], g_addresses[i]);
+            }
+        }
+        //LogLine("All controllers disconnected.\n");
+    } else {
+        commandSuccess = false;
+    }
+
+    // Exit Bluetooth manager
+    btmExit();
+}
 
 std::unordered_map<std::string, std::string> createButtonCharMap() {
     std::unordered_map<std::string, std::string> map;
@@ -83,14 +156,6 @@ std::string convertComboToUnicode(const std::string& combo) {
 }
 
 
-
-bool isDownloadCommand = false;
-bool commandSuccess = false;
-bool refreshGui = false;
-bool interpreterLogging = false;
-
-bool usingErista = util::IsErista();
-bool usingMariko = util::IsMariko();
 
 
 
@@ -285,7 +350,10 @@ void drawTable(std::unique_ptr<tsl::elm::List>& list, const std::vector<std::str
     list->addItem(new tsl::elm::TableDrawer([=](tsl::gfx::Renderer* renderer, s32 x, s32 y, s32 w, s32 h) mutable {
         for (size_t i = 0; i < infoLines.size(); ++i) {
             if (infoStringWidths[i] == 0.0f) {  // Calculate only if not already calculated
-                infoStringWidths[i] = renderer->calculateStringWidth(infoLines[i], fontSize, false);
+                if (infoLines[i] != NULL_STR)
+                    infoStringWidths[i] = renderer->calculateStringWidth(infoLines[i], fontSize, false);
+                else
+                    infoStringWidths[i] = renderer->calculateStringWidth(UNAVAILABLE_SELECTION, fontSize, false);
             }
 
             if (alignment == LEFT_STR) {
@@ -299,7 +367,9 @@ void drawTable(std::unique_ptr<tsl::elm::List>& list, const std::vector<std::str
 
         for (size_t i = 0; i < sectionLines.size(); ++i) {
             renderer->drawString(sectionLines[i].c_str(), false, x + 12, y + yOffsets[i], fontSize, renderer->a((tableSectionTextColor == DEFAULT_STR) ? sectionTextColor : alternateSectionTextColor));
-            renderer->drawString(infoLines[i].c_str(), false, x + infoXOffsets[i], y + yOffsets[i], fontSize, renderer->a((tableInfoTextColor == DEFAULT_STR) ? infoTextColor : alternateInfoTextColor));
+            // Check if infoLines[i] is "null" and replace it with UNAVAILABLE_SELECTION if true
+            std::string infoText = (infoLines[i] == NULL_STR) ? UNAVAILABLE_SELECTION : infoLines[i];
+            renderer->drawString(infoText.c_str(), false, x + infoXOffsets[i], y + yOffsets[i], fontSize, renderer->a((tableInfoTextColor == DEFAULT_STR) ? infoTextColor : alternateInfoTextColor));
         }
     }, hideTableBackground, endGap), totalHeight);
 }
@@ -747,7 +817,6 @@ inline std::string replacePlaceholder(const std::string& input, const std::strin
 
 
 
-// `{hex_file(customAsciiPattern, offsetStr, length)}`
 std::string replaceIniPlaceholder(const std::string& arg, const std::string& iniPath) {
     const std::string searchString = "{ini_file(";
     size_t startPos = arg.find(searchString);
@@ -760,7 +829,7 @@ std::string replaceIniPlaceholder(const std::string& arg, const std::string& ini
         return arg;
     }
 
-    std::string replacement = arg;  // Now we copy arg because we need to modify it
+    std::string replacement = arg;  // Copy arg because we need to modify it
 
     std::string placeholderContent = replacement.substr(startPos + searchString.length(), endPos - startPos - searchString.length());
     size_t commaPos = placeholderContent.find(',');
@@ -769,7 +838,8 @@ std::string replaceIniPlaceholder(const std::string& arg, const std::string& ini
         std::string iniKey = removeQuotes(trim(placeholderContent.substr(commaPos + 1)));
 
         std::string parsedResult = parseValueFromIniSection(iniPath, iniSection, iniKey);
-        replacement.replace(startPos, endPos - startPos + searchString.length() + 2, parsedResult);
+        // Replace the placeholder with the parsed result and keep the remaining string intact
+        replacement = replacement.substr(0, startPos) + parsedResult + replacement.substr(endPos + 2);
     }
 
     return replacement;
@@ -840,13 +910,19 @@ std::vector<std::vector<std::string>> getSourceReplacement(const std::vector<std
                     lastArg = modifiedArg;
                 }
                 while (modifiedArg.find("{file_name}") != std::string::npos) {
-                    modifiedArg = replacePlaceholder(modifiedArg, "{file_name}", dropExtension(getNameFromPath(entry)));
+                    std::string fileName;
+                    if (isDirectory(entry)) {
+                        fileName = getNameFromPath(entry); // Use the name of the folder itself
+                    } else {
+                        fileName = dropExtension(getNameFromPath(entry)); // Drop the extension for files
+                    }
+                    modifiedArg = replacePlaceholder(modifiedArg, "{file_name}", fileName);
                     if (modifiedArg == lastArg)
                         break;
                     lastArg = modifiedArg;
                 }
                 while (modifiedArg.find("{folder_name}") != std::string::npos) {
-                    modifiedArg = replacePlaceholder(modifiedArg, "{folder_name}", getParentDirNameFromPath(entry));
+                    modifiedArg = replacePlaceholder(modifiedArg, "{folder_name}", removeQuotes(getParentDirNameFromPath(entry)));
                     if (modifiedArg == lastArg)
                         break;
                     lastArg = modifiedArg;
@@ -960,13 +1036,14 @@ auto replacePlaceholders = [](std::string& arg, const std::string& placeholder, 
 
         replacement = replacer(arg.substr(startPos, endPos - startPos + 2));
         if (replacement.empty()) {
-            replacement = (placeholder.find("{json(") != std::string::npos || placeholder.find("{json_file(") != std::string::npos) ? UNAVAILABLE_SELECTION : NULL_STR;
+            replacement = NULL_STR;
         }
         arg.replace(startPos, endPos - startPos + 2, replacement);
         if (arg == lastArg) {
             if (interpreterLogging) {
                 logMessage("failed replacement arg: " + arg);
             }
+            replacement = NULL_STR;
             arg.replace(startPos, endPos - startPos + 2, replacement);
             break;
         }
@@ -1044,7 +1121,7 @@ void applyPlaceholderReplacement(std::vector<std::string>& cmd, std::string hexP
         }
 
         // Failed replacement cleanup
-        if (arg == NULL_STR) arg = UNAVAILABLE_SELECTION;
+        //if (arg == NULL_STR) arg = UNAVAILABLE_SELECTION;
     }
 }
 
@@ -1243,8 +1320,17 @@ void processCommand(const std::vector<std::string>& cmd, const std::string& pack
             } else {
                 destinationPath = ROOT_PATH;
             }
-            
-            mirrorFiles(sourcePath, destinationPath, (commandName == "mirror_copy" || commandName == "mirror_cp") ? "copy" : "delete");
+            if (sourcePath.find('*') == std::string::npos)
+                mirrorFiles(sourcePath, destinationPath, (commandName == "mirror_copy" || commandName == "mirror_cp") ? "copy" : "delete");
+            else {
+                std::vector<std::string> fileList = getFilesListByWildcards(sourcePath);
+
+                // Iterate through the file list
+                for (const std::string& sourceDirectory : fileList) {
+                    mirrorFiles(sourceDirectory, destinationPath, (commandName == "mirror_copy" || commandName == "mirror_cp") ? "copy" : "delete");
+                }
+            }
+
         }
     } else if (commandName == "mv" || commandName == "move" || commandName == "rename" ) { // Rename command
         if (cmdSize >= 3) {
@@ -1431,6 +1517,11 @@ void processCommand(const std::vector<std::string>& cmd, const std::string& pack
             std::string destinationPath = preprocessPath(cmd[2], packagePath);
             commandSuccess = pchtxt2ips(sourcePath, destinationPath) && commandSuccess;
         }
+    } else if (commandName == "pchtxt2cheat") {
+        if (cmdSize >= 2) {
+            std::string sourcePath = preprocessPath(cmd[1], packagePath);
+            commandSuccess = pchtxt2cheat(sourcePath) && commandSuccess;
+        }
     } else if (commandName == "exec") {
         if (cmdSize >= 2) {
             std::string bootCommandName = removeQuotes(cmd[1]);
@@ -1567,10 +1658,17 @@ void processCommand(const std::vector<std::string>& cmd, const std::string& pack
         spsmShutdown(SpsmShutdownMode_Reboot);
         
     } else if (commandName == "shutdown") {
-        // Reboot command
-        splExit();
-        fsdevUnmountAll();
-        spsmShutdown(SpsmShutdownMode_Normal);
+        if (cmdSize >= 2) {
+            std::string selection = removeQuotes(cmd[1]);
+            if (selection == "controllers") {
+                powerOffAllControllers();
+            }
+        } else {
+            // Shutdown command
+            splExit();
+            fsdevUnmountAll();
+            spsmShutdown(SpsmShutdownMode_Normal);
+        }
     } else if (commandName == "exit") {
         triggerExit.store(true, std::memory_order_release);
         return;
@@ -1602,7 +1700,6 @@ void processCommand(const std::vector<std::string>& cmd, const std::string& pack
             }
             lblExit();
         }
-        
     } else if (commandName == "refresh") {
         refreshGui = true;
     } else if (commandName == "logging") {
@@ -1709,6 +1806,9 @@ void startInterpreterThread(int stackSize = 0x8000) {
     int result = threadCreate(&interpreterThread, backgroundInterpreter, nullptr, nullptr, stackSize, 0x2B, -2);
     if (result != 0) {
         commandSuccess = false;
+        clearInterpreterFlags();
+        runningInterpreter.store(false, std::memory_order_release);
+        interpreterThreadExit.store(true, std::memory_order_release);
         logMessage("Failed to create interpreter thread.");
         return;
     }
