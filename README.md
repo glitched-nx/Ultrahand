@@ -65,7 +65,8 @@ Um BlueHAND zu verwenden, befolge diese Schritte:
 3. Nach der Installation von BlueHAND wird ein neuer Ordner namens `ultrahand` im config Verzeichnis auf deiner SD-Karte (`/config/ultrahand/`) zusammen mit einer `config.ini`-Datei erstellt, die verschiedene BlueHAND-Einstellungen enthält.
 4. Starte BlueHAND (ähnlich wie `Tesla Menu`) mit deiner festgelegten Tesla Tasten-Kombi oder BlueHAND's (`L+R+PLUS`). Es wird ein neuer Ordner (`/switch/.packages/`) mit einer vordefinierten `package.ini`-Datei für deine Grundmenübefehle erstellt.
 
-5. Platziere deine benutzerdefinierte `package.ini`-Paketdatei in deinem Ultrahand-Paketverzeichnis (`/switch/.packages/<PACKAGE_NAME>/`). Diese Datei enthält die Befehle für dein benutzerdefiniertes Ultrahand-Paket.
+5. Platziere deine erstellte `package.ini` Skript- Datei ins Verzeichnis (`SD:/switch/.packages/<PACKAGE_NAME>/`). 
+    - Siehe [Ultrahand Packages] (https://github.com/ppkantorski/Ultrahand-Packages) für eine vollständige Liste der bekannten Pakete.
 6. Deine Befehle werden nun im Paketmenü innerhalb von BlueHAND angezeigt.
 
 ## Zusätzliche Funktionen
