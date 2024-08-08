@@ -30,8 +30,8 @@
 const std::string BOOT_PACKAGE_FILENAME = "boot_package.ini";
 const std::string PACKAGE_FILENAME = "package.ini";
 const std::string CONFIG_FILENAME = "config.ini";
-const std::string ULTRAHAND_PROJECT_NAME = "bluehand";
-const std::string CAPITAL_ULTRAHAND_PROJECT_NAME = "BlueHAND";
+const std::string ULTRAHAND_PROJECT_NAME = "UltraHAND";
+const std::string CAPITAL_ULTRAHAND_PROJECT_NAME = "UltraHAND";
 const std::string ROOT_PATH = "sdmc:/";
 const std::string SETTINGS_PATH = "sdmc:/config/ultrahand/";
 const std::string ULTRAHAND_CONFIG_INI_PATH = "sdmc:/config/ultrahand/config.ini";
@@ -44,11 +44,11 @@ const std::string PACKAGE_PATH = "sdmc:/switch/.packages/";
 const std::string OVERLAY_PATH = "sdmc:/switch/.overlays/";
 const std::string OVERLAYS_INI_FILEPATH = "sdmc:/config/ultrahand/overlays.ini";
 const std::string PACKAGES_INI_FILEPATH = "sdmc:/config/ultrahand/packages.ini";
-const std::string ULTRAHAND_REPO_URL = "https://github.com/glitched-nx/BlueHAND/";
+const std::string ULTRAHAND_REPO_URL = "https://github.com/glitched-nx/UltraHAND/";
 
 
-const std::string TESLA_COMBO_STR = "L+DDOWN+RS";
-const std::string ULTRAHAND_COMBO_STR = "ZL+ZR+DDOWN";
+const std::string TESLA_COMBO_STR = "L+R+PLUS";
+const std::string ULTRAHAND_COMBO_STR = "L+R+PLUS";
 const std::string TESLA_STR = "tesla";
 const std::string ERISTA_STR = "erista";
 const std::string MARIKO_STR = "mariko";

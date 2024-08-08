@@ -3569,7 +3569,7 @@ namespace tsl {
                     PCB_temperatureStringSTD.clear();
                     SOC_temperatureStringSTD.clear();
                     
-                    std::string firstHalf = "Blue";
+                    std::string firstHalf = "Ultra";
                     std::string secondHalf = "HAND";
 
 
