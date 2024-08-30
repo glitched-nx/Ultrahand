@@ -3988,8 +3988,8 @@ namespace tsl {
             std::string m_pageLeftName; // CUSTOM MODIFICATION
             std::string m_pageRightName; // CUSTOM MODIFICATION
             
-            std::string firstHalf = "Ultra";
-            std::string secondHalf = "hand";
+            std::string firstHalf = " GAME";
+            std::string secondHalf = " BOY";
             //std::string firstHalf, secondHalf;
             //tsl::Color handColor = RGB888("#F7253E");
             tsl::Color titleColor = {0xF,0xF,0xF,0xF};
