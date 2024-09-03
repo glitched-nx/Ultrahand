@@ -262,7 +262,7 @@ bool unzipFile(const std::string& zipFilePath, const std::string& toDestination)
 
         // Remove invalid characters
         extractedFilePath = toDestination + fileName;
-        auto it = extractedFilePath.begin() + std::min(extractedFilePath.find("sdmc:/") + 5, extractedFilePath.size());
+        auto it = extractedFilePath.begin() + std::min(extractedFilePath.find(ROOT_PATH) + 5, extractedFilePath.size());
         extractedFilePath.erase(std::remove_if(it, extractedFilePath.end(), [](char c) {
             return c == ':' || c == '*' || c == '?' || c == '\"' || c == '<' || c == '>' || c == '|';
         }), extractedFilePath.end());
@@ -296,7 +296,7 @@ bool unzipFile(const std::string& zipFilePath, const std::string& toDestination)
                 break;
             }
             outputFile.write(buffer, bytesRead);
-            //logMessage("Extracted: " + extractedFilePath);
+            logMessage("Extracted: " + extractedFilePath);
 
             currentUncompressedSize += bytesRead;
 

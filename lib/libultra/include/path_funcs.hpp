@@ -55,7 +55,7 @@ inline void createSingleDirectory(const std::string& directoryPath) {
  * @param directoryPath The path of the directory to be created.
  */
 inline void createDirectory(const std::string& directoryPath) {
-    std::string volume = "sdmc:/";
+    std::string volume = ROOT_PATH;
     std::string path = directoryPath;
 
     // Remove leading "sdmc:/" if present
@@ -160,7 +160,7 @@ void deleteFileOrDirectory(const std::string& pathToDelete, const std::string& l
         currentPath = stack.back();
         
         if (stat(currentPath.c_str(), &pathStat) != 0) {
-            logMessage("Error accessing path: " + currentPath);
+            //logMessage("Error accessing path: " + currentPath);
             stack.pop_back();
             continue;
         }
@@ -478,7 +478,7 @@ inline void copySingleFile(const std::string& fromFile, const std::string& toFil
                     const std::string& logSource = "", const std::string& logDestination = "") {
     std::ifstream srcFile(fromFile, std::ios::binary);
     std::ofstream destFile(toFile, std::ios::binary);
-    const size_t COPY_BUFFER_SIZE = 4096;
+    //const size_t COPY_BUFFER_SIZE = 4096;
     char buffer[COPY_BUFFER_SIZE];
     
     if (!srcFile || !destFile) {
@@ -710,7 +710,7 @@ void copyFileOrDirectoryByPattern(const std::string& sourcePathPattern, const st
     for (const std::string& sourcePath : fileList) {
         copyFileOrDirectory(sourcePath, toDirectory, &totalBytesCopied, totalSize, logSource, logDestination);
     }
-    copyPercentage.store(-1, std::memory_order_release);  // Reset after operation
+    //copyPercentage.store(-1, std::memory_order_release);  // Reset after operation
 }
 
 
