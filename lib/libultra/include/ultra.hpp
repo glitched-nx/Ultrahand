@@ -48,15 +48,13 @@ const std::string PACKAGE_PATH = "sdmc:/switch/.packages/";
 const std::string OVERLAY_PATH = "sdmc:/switch/.overlays/";
 const std::string OVERLAYS_INI_FILEPATH = "sdmc:/config/ultrahand/overlays.ini";
 const std::string PACKAGES_INI_FILEPATH = "sdmc:/config/ultrahand/packages.ini";
-const std::string ULTRAHAND_REPO_URL = "https://github.com/ppkantorski/Ultrahand-Overlay/";
-const std::string INCLUDED_THEME_FOLDER_URL = "https://raw.githubusercontent.com/ppkantorski/Ultrahand-Overlay/main/themes/";
-const std::string LATEST_RELEASE_INFO_URL = "https://raw.githubusercontent.com/ppkantorski/Ultrahand-Overlay/main/RELEASE.ini";
+const std::string ULTRAHAND_REPO_URL = "https://github.com/glitched-nx/UltraHAND/";
+const std::string INCLUDED_THEME_FOLDER_URL = "https://raw.githubusercontent.com/glitched-nx/UltraHAND/main/themes/";
+const std::string LATEST_RELEASE_INFO_URL = "https://raw.githubusercontent.com/glitched-nx/UltraHAND/main/RELEASE.ini";
 const std::string NX_OVLLOADER_ZIP_URL = "https://github.com/ppkantorski/nx-ovlloader/releases/download/v1.0.8/nx-ovlloader.zip";
 const std::string NX_OVLLOADER_PLUS_ZIP_URL = "https://github.com/ppkantorski/nx-ovlloader/releases/download/v1.0.8/nx-ovlloader+.zip";
-
-const std::string TESLA_COMBO_STR = "L+DDOWN+RS";
-const std::string ULTRAHAND_COMBO_STR = "ZL+ZR+DDOWN";
-
+const std::string TESLA_COMBO_STR = "L+R+PLUS";
+const std::string ULTRAHAND_COMBO_STR = "L+R+PLUS";
 const std::string FUSE_STR = "fuse";
 const std::string TESLA_STR = "tesla";
 const std::string ERISTA_STR = "erista";
