@@ -39,7 +39,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 
 APP_TITLE			:=		Tesla Example
-APP_VERSION 	:= 		1.3.0
+APP_VERSION 	:= 		1.4.0
 
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
