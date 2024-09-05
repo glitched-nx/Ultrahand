@@ -64,11 +64,12 @@ inline std::string cleanDirectoryName(const std::string& name) {
 inline std::string trim(const std::string& str) {
     size_t first = str.find_first_not_of(" \t\n\r\f\v");
     if (first == std::string::npos)
-        return "";
+        return {};  // Use {} to avoid an extra constructor call
 
     size_t last = str.find_last_not_of(" \t\n\r\f\v");
     return str.substr(first, last - first + 1);
 }
+
 
 // Function to trim newline characters from the end of a string
 inline std::string trimNewline(const std::string &str) {
@@ -437,7 +438,7 @@ inline std::string cleanVersionLabel(const std::string& input) {
             }
         }
     }
-
+    
     return versionLabel;
 }
 
@@ -464,8 +465,7 @@ inline std::string removeFilename(const std::string& path) {
 }
 
 
-// Function to split a string by a delimiter and return a specific index
-inline std::string splitString(const std::string& str, const std::string& delimiter, size_t index) {
+std::vector<std::string> splitString(const std::string& str, const std::string& delimiter) {
     std::vector<std::string> tokens;
     size_t start = 0;
     size_t end = str.find(delimiter);
@@ -476,12 +476,28 @@ inline std::string splitString(const std::string& str, const std::string& delimi
     }
     tokens.push_back(str.substr(start));
 
+    return tokens;
+}
+
+
+// Function to split a string by a delimiter and return a specific index
+inline std::string splitStringAtIndex(const std::string& str, const std::string& delimiter, size_t index) {
+    std::vector<std::string> tokens = splitString(str, delimiter);
+
     if (index < tokens.size()) {
         return tokens[index];
     } else {
         return ""; // Return empty string if index is out of bounds
     }
 }
+
+
+std::string customAlign(int number) {
+    std::string numStr = std::to_string(number);
+    int missingDigits = 4 - numStr.length();
+    return std::string(missingDigits * 2, ' ') + numStr;
+}
+
 
 
 //std::string padToEqualLength(const std::string& str, size_t len) {

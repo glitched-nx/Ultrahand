@@ -31,6 +31,9 @@
 size_t DOWNLOAD_BUFFER_SIZE = 4096*4;
 size_t UNZIP_BUFFER_SIZE = 4096*4;
 
+// Path to the CA certificate
+const std::string cacertPath = "sdmc:/config/ultrahand/cacert.pem";
+const std::string cacertURL = "https://curl.se/ca/cacert.pem";
 
 // Shared atomic flag to indicate whether to abort the download operation
 static std::atomic<bool> abortDownload(false);
@@ -122,15 +125,22 @@ bool downloadFile(const std::string& url, const std::string& toDestination) {
         createDirectory(destination.substr(0, destination.find_last_of('/')));
     }
 
-    std::ofstream file(destination, std::ios::binary);
+    if (!isDirectory(DOWNLOADS_PATH)) {
+        createDirectory(DOWNLOADS_PATH);
+    }
+    
+    std::string tempFilePath = DOWNLOADS_PATH + getFileName(destination) + ".tmp";
+
+    std::ofstream file(tempFilePath, std::ios::binary);
     if (!file.is_open()) {
-        logMessage("Error opening file: " + destination);
+        logMessage("Error opening file: " + tempFilePath);
         return false;
     }
 
     std::unique_ptr<CURL, CurlDeleter> curl(curl_easy_init());
     if (!curl) {
         logMessage("Error initializing curl.");
+        file.close();
         return false;
     }
 
@@ -145,6 +155,11 @@ bool downloadFile(const std::string& url, const std::string& toDestination) {
     curl_easy_setopt(curl.get(), CURLOPT_USERAGENT, userAgent.c_str());
     curl_easy_setopt(curl.get(), CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS); // Enable HTTP/2
     curl_easy_setopt(curl.get(), CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2); // Force TLS 1.2
+
+    // Disable SSL verification for testing purposes
+    //curl_easy_setopt(curl.get(), CURLOPT_SSL_VERIFYPEER, 0L);
+    //curl_easy_setopt(curl.get(), CURLOPT_SSL_VERIFYHOST, 0L);
+
     curl_easy_setopt(curl.get(), CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl.get(), CURLOPT_BUFFERSIZE, DOWNLOAD_BUFFER_SIZE); // Increase buffer size
 
@@ -153,22 +168,25 @@ bool downloadFile(const std::string& url, const std::string& toDestination) {
 
     if (result != CURLE_OK) {
         logMessage("Error downloading file: " + std::string(curl_easy_strerror(result)));
-        deleteFileOrDirectory(destination);
+        deleteFileOrDirectory(tempFilePath);
         downloadPercentage.store(-1, std::memory_order_release);
         return false;
     }
 
-    std::ifstream checkFile(destination);
+    std::ifstream checkFile(tempFilePath);
     if (!checkFile || checkFile.peek() == std::ifstream::traits_type::eof()) {
         logMessage("Error downloading file: Empty file");
-        deleteFileOrDirectory(destination);
+        deleteFileOrDirectory(tempFilePath);
         downloadPercentage.store(-1, std::memory_order_release);
+        checkFile.close();
         return false;
     }
     checkFile.close();
 
     downloadPercentage.store(100, std::memory_order_release);
-    logMessage("Download Complete!");
+    moveFile(tempFilePath, destination);
+
+    //logMessage("Download Complete!");
     return true;
 }
 
@@ -244,7 +262,7 @@ bool unzipFile(const std::string& zipFilePath, const std::string& toDestination)
 
         // Remove invalid characters
         extractedFilePath = toDestination + fileName;
-        auto it = extractedFilePath.begin() + std::min(extractedFilePath.find("sdmc:/") + 5, extractedFilePath.size());
+        auto it = extractedFilePath.begin() + std::min(extractedFilePath.find(ROOT_PATH) + 5, extractedFilePath.size());
         extractedFilePath.erase(std::remove_if(it, extractedFilePath.end(), [](char c) {
             return c == ':' || c == '*' || c == '?' || c == '\"' || c == '<' || c == '>' || c == '|';
         }), extractedFilePath.end());
@@ -293,7 +311,7 @@ bool unzipFile(const std::string& zipFilePath, const std::string& toDestination)
 
     if (success) {
         unzipPercentage.store(100, std::memory_order_release); // Ensure it's set to 100% on successful extraction
-        logMessage("Extraction Complete!");
+        //logMessage("Extraction Complete!");
     } else {
         unzipPercentage.store(-1, std::memory_order_release);
     }

@@ -22,9 +22,9 @@
 #include <string>   // For std::string
 #include <vector>   // For std::vector
 #include <map>      // For std::map
-#include <sstream>  // For std::istringstream
+//#include <sstream>  // For std::istringstream
 #include <algorithm> // For std::remove_if
-#include <cctype>   // For ::isspace
+//#include <cctype>   // For ::isspace
 #include "get_funcs.hpp"
 #include "path_funcs.hpp"
 
@@ -112,20 +112,23 @@ PackageHeader getPackageHeaderFromIni(const std::string& filePath) {
  */
 static std::vector<std::string> split(const std::string& str, char delim = ' ') {
     std::vector<std::string> out;
-
-    // Reserve an estimated amount of space to reduce reallocations
-    out.reserve(10); // Assuming an average of 10 tokens per string
-
-    std::string_view strv = str;
-    size_t current, previous = 0;
-    current = strv.find(delim);
-
-    while (current != std::string::npos) {
-        out.emplace_back(strv.substr(previous, current - previous));
-        previous = current + 1;
-        current = strv.find(delim, previous);
+    
+    if (str.empty()) {
+        return out;
     }
-    out.emplace_back(strv.substr(previous)); // No need to calculate the length
+    
+    // Reserve space assuming the worst case where every character is a delimiter
+    out.reserve(std::count(str.begin(), str.end(), delim) + 1);
+    
+    size_t start = 0;
+    size_t end = str.find(delim);
+    
+    while (end != std::string::npos) {
+        out.emplace_back(str.substr(start, end - start));
+        start = end + 1;
+        end = str.find(delim, start);
+    }
+    out.emplace_back(str.substr(start));
     
     return out;
 }
@@ -194,7 +197,7 @@ std::map<std::string, std::map<std::string, std::string>> getParsedDataFromIniFi
     std::map<std::string, std::map<std::string, std::string>> parsedData;
     std::ifstream configFile(configIniPath);
     if (!configFile) {
-        logMessage("Failed to open the file: " + configIniPath);
+        //logMessage("Failed to open the file: " + configIniPath);
         return parsedData;  // Return empty map if file cannot be opened
     }
     
@@ -227,6 +230,56 @@ std::map<std::string, std::map<std::string, std::string>> getParsedDataFromIniFi
 
 
 /**
+ * @brief Parses an INI file and retrieves key-value pairs from a specific section.
+ *
+ * This function reads the contents of an INI file located at the specified path,
+ * and returns the key-value pairs within a specific section.
+ *
+ * @param configIniPath The path to the INI file to be parsed.
+ * @param sectionName The name of the section to retrieve key-value pairs from.
+ * @return A map representing the key-value pairs in the specified section.
+ */
+std::map<std::string, std::string> getKeyValuePairsFromSection(const std::string& configIniPath, const std::string& sectionName) {
+    std::map<std::string, std::string> sectionData;
+    std::ifstream configFile(configIniPath);
+    if (!configFile) {
+        //logMessage("Failed to open the file: " + configIniPath);
+        return sectionData;  // Return empty map if file cannot be opened
+    }
+    
+    std::string line, currentSection;
+    std::string trimmedLine;
+    
+    size_t delimiterPos;
+    std::string key, value;
+    bool inTargetSection = false;  // To track if we're in the desired section
+    
+    while (getline(configFile, line)) {
+        trimmedLine = trim(line);
+        
+        if (trimmedLine.empty()) continue; // Skip empty lines
+        
+        if (trimmedLine.front() == '[' && trimmedLine.back() == ']') {
+            // Remove the brackets to get the section name
+            currentSection = trimmedLine.substr(1, trimmedLine.size() - 2);
+            // Check if this is the section we're interested in
+            inTargetSection = (currentSection == sectionName);
+        } else if (inTargetSection) {
+            // Look for key-value pairs within the target section
+            delimiterPos = trimmedLine.find('=');
+            if (delimiterPos != std::string::npos) {
+                key = trim(trimmedLine.substr(0, delimiterPos));
+                value = trim(trimmedLine.substr(delimiterPos + 1));
+                sectionData[key] = value;  // Store the key-value pair
+            }
+        }
+    }
+
+    return sectionData;
+}
+
+
+/**
  * @brief Parses sections from an INI file and returns them as a list of strings.
  *
  * This function reads an INI file and extracts the section names from it.
@@ -238,7 +291,7 @@ std::vector<std::string> parseSectionsFromIni(const std::string& filePath) {
     std::vector<std::string> sections;
     std::ifstream file(filePath);
     if (!file) {
-        logMessage("Failed to open the file: " + filePath);
+        //logMessage("Failed to open the file: " + filePath);
         return sections;  // Early return if the file cannot be opened
     }
     
@@ -272,7 +325,7 @@ std::string parseValueFromIniSection(const std::string& filePath, const std::str
     std::string value = "";
     std::ifstream file(filePath);
     if (!file) {
-        logMessage("Failed to open the file: " + filePath);
+        //logMessage("Failed to open the file: " + filePath);
         return value;  // Return empty if the file cannot be opened
     }
     
@@ -738,6 +791,43 @@ void removeIniKey(const std::string& filePath, const std::string& sectionName, c
         // Handle the error accordingly
     }
 }
+
+
+//void saveIniFileData(const std::string& filePath, const std::map<std::string, std::map<std::string, std::string>>& data) {
+//    std::ofstream file(filePath);
+//    if (!file.is_open()) {
+//        // Handle error: could not open file
+//        return;
+//    }
+//
+//    for (const auto& section : data) {
+//        file << "[" << section.first << "]\n";
+//        for (const auto& kv : section.second) {
+//            file << kv.first << "=" << kv.second << "\n";
+//        }
+//        file << "\n"; // Separate sections with a newline
+//    }
+//
+//    file.close();
+//}
+
+
+void updateIniData(const std::map<std::string, std::map<std::string, std::string>>& packageConfigData,
+                   const std::string& packageConfigIniPath,
+                   const std::string& optionName,
+                   const std::string& key,
+                   std::string& value) {
+    auto optionIt = packageConfigData.find(optionName);
+    if (optionIt != packageConfigData.end()) {
+        auto it = optionIt->second.find(key);
+        if (it != optionIt->second.end()) {
+            value = it->second;  // Update value only if the key exists
+        } else {
+            setIniFileValue(packageConfigIniPath, optionName, key, value); // Set INI file value if key not found
+        }
+    }
+}
+
 
 
 // Helper functions

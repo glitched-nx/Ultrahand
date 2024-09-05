@@ -20,8 +20,10 @@
 #include <mutex>
 
 // Specify the log file path
-const std::string logFilePath = "sdmc:/config/ultrahand/log.txt";
+const std::string defaultLogFilePath = "sdmc:/switch/.packages/log.txt";
 
+static std::string logFilePath = defaultLogFilePath; 
+static bool disableLogging = true;
 
 // Global mutex for thread-safe logging
 std::mutex logMutex;
@@ -32,24 +34,27 @@ std::mutex logMutex;
  * @param message The message to be logged.
  */
 void logMessage(const std::string& message) {
+    if (disableLogging)
+        return;
     std::time_t currentTime = std::time(nullptr);
     std::tm* timeInfo = std::localtime(&currentTime);
-    char buffer[80];
-    strftime(buffer, 80, "[%Y-%m-%d %H:%M:%S] ", timeInfo);
+    char buffer[30];
+    strftime(buffer, 30, "[%Y-%m-%d %H:%M:%S] ", timeInfo);
     std::string timestamp(buffer);
 
-    std::string logEntry = timestamp + message + "\n";
+    //std::string logEntry = timestamp + message + "\n";
 
     // Open the file with std::ofstream in append mode inside the lock
     {
         std::lock_guard<std::mutex> lock(logMutex); // Locks the mutex for the duration of this block
 
-        std::ofstream file(logFilePath, std::ios::app);
+        std::ofstream file(logFilePath.c_str(), std::ios::app);
         if (file.is_open()) {
-            file << logEntry;
+            file << timestamp + message + "\n";
         } else {
             // Handle error when file opening fails, such as logging to an alternative output or retrying
             //std::cerr << "Failed to open log file: " << logFilePath << std::endl;
         }
+        file.close();
     } // file closes automatically upon leaving this block
 }
