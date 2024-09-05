@@ -61,7 +61,7 @@ Ultrahand Overlay currently offers the following features:
 
 To use Ultrahand, follow these steps:
 
-1. Download and install the latest [nxovloader](https://github.com/WerWolv/nx-ovlloader).
+1. Download and install the latest [nxovloader](https://github.com/ppkantorski/nx-ovlloader).
 2. Download the latest Ultrahand [ovlmenu.ovl](https://github.com/ppkantorski/Ultrahand-Overlay/releases/latest/download/ovlmenu.ovl) and place it within `/switch/.overlays/`.
     - WARNING: This will overwrite `Tesla Menu` if already installed.
 3. After installing Ultrahand Overlay, a new folder named `ultrahand` will be created within the root config folder on your SD card (`/config/ultrahand/`) along with a `config.ini` file containing various Ultrahand settings.
@@ -89,7 +89,7 @@ Please note that running homebrew software on your Nintendo Switch may void your
 To compile and run the software, you need to have the following C/C++ dependencies installed:
 
 - [libultra](lib/libultra)
-- [custom libtesla](lib/libtesla)
+- [libtesla (custom)](lib/libtesla)
 - switch-curl
 - switch-zziplib
 - switch-mbedtls
@@ -102,6 +102,6 @@ Contributions are welcome! If you have any ideas, suggestions, or bug reports, p
 
 ## License
 
-This project is licensed and distributed under [GPLv2](LICENSE) with a custom library utilizing [CC-BY-4.0](SUB_LICENSE).
+This project is licensed and distributed under [GPLv2](LICENSE) with a [custom library](lib/libultra) utilizing [CC-BY-4.0](SUB_LICENSE).
 
 Copyright (c) 2024 ppkantorski
