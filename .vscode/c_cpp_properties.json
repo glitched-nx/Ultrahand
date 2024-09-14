@@ -1,36 +1,45 @@
 {
+    "env": {
+      "myIncludePath": ["${workspaceFolder}/include", "${workspaceFolder}/src"],
+      "myDefines": ["DEBUG", "MY_FEATURE=1"]
+    },
     "configurations": [
         {
-            "name": "DKP msys64",
+            "name": "msys2-devkitpro-switch",
             "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/common",
+                "${workspaceFolder}/source",
                 "c:/msys64/opt/devkitpro/**",
                 "c:/msys64/opt/devkitpro/tools/**",
                 "c:/msys64/opt/devkitpro/devkitA64/**",
-                "c:/msys64/opt/devkitpro/devkitA64/lib/gcc/aarch64-none-elf/14.1.0/include",
+                "c:/msys64/opt/devkitpro/devkitA64/include",
+                "c:/msys64/opt/devkitpro/devkitA64/lib/gcc/aarch64-none-elf/14.2.0/include",
                 "c:/msys64/opt/devkitpro/libnx/**",
                 "c:/msys64/opt/devkitpro/libnx/include",
                 "c:/msys64/opt/devkitpro/portlibs/**",
                 "c:/msys64/opt/devkitpro/portlibs/switch/include",
-                "${workspaceFolder}/**",
                 "${workspaceFolder}/lib/libtesla/**",
                 "${workspaceFolder}/lib/libtesla/include",
                 "${workspaceFolder}/lib/libultra/**",
-                "${workspaceFolder}/lib/libultra/include",
-                "${workspaceFolder}/common",
-                 "${workspaceFolder}/source"
+                "${workspaceFolder}/lib/libultra/include"
             ],
             "defines": [
                 "__SWITCH__",
                 "NDEBUG",
                 "STBTT_STATIC",
                 "ULTRA_HPP",
-                "TESLA_INIT_IMPL"
+                "TESLA_INIT_IMPL",
+                "IRAM_PAYLOAD_MAX_SIZE",
+                "IRAM_PAYLOAD_BASE"
             ],
-            "compilerPath": "c:/msys64/opt/devkitpro/devkitA64/bin/aarch64-none-elf-g++",
-            "cStandard": "c11",
+            "windowsSdkVersion": "10.0.22621.2",
+            "compilerPath": "c:/msys64/opt/devkitpro/devkitA64/bin/aarch64-none-elf-gcc",
+            "cStandard": "c17",
             "cppStandard": "c++20",
             "intelliSenseMode": "windows-gcc-arm64"
         }
     ],
-    "version": 4
+    "version": 4,
+    "enableConfigurationSquiggles": true
 }
