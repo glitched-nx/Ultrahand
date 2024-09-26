@@ -38,6 +38,6 @@
     {
         "name": "quickReBoot - latest",
         "label": "quickReBoot",
-        "file-1-url": "https://raw.githubusercontent.com/glitched-nx/ultraHAND/main/examples/quickReBoot/package.ini"
+        "file-1-url": "https://raw.githubusercontent.com/ppkantorski/Ultrahand-Overlay/main/examples/quickReBoot/package.ini"
     }
 ]
